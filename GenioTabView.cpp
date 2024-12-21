@@ -416,8 +416,30 @@ GenioTabView::_ChangeGroupViewDirection(GTab* tab)
 	}
 
 }
+/*
+BSize
+GenioTabView::MinSize()
+{
+	if (CountTabs() == 0)
+		return BSize(64, 64);
+	return BTabView::MinSize();
+}
 
-
+BSize
+GenioTabView::MaxSize()
+{
+	if (CountTabs() == 0)
+		return BSize(64, 64);
+	return BTabView::MaxSize();
+}
+BSize
+GenioTabView::PreferredSize()
+{
+	if (CountTabs() == 0)
+		return BSize(64, 64);
+	return BTabView::PreferredSize();
+}
+*/
 BTab*
 GenioTabView::RemoveTab(int32 tabIndex)
 {

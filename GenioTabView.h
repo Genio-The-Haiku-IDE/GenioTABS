@@ -31,6 +31,10 @@ public:
 	virtual	void	MouseMoved(BPoint where, uint32 transit,
 									const BMessage* dragMessage);
 	virtual void	MessageReceived(BMessage* msg);
+//
+	// virtual BSize	MaxSize();
+	// virtual BSize	MinSize();
+	// virtual BSize	PreferredSize();
 
 			void	AddTab(BView* target, tab_id id);
 
@@ -50,7 +54,7 @@ private:
 			using BTabView::Select;
 
 			BTab*	RemoveTab(int32 tabIndex);
-			BView*	ContainerView() const = delete;
+//			BView*	ContainerView() const = delete;
 			BView*	ViewForTab(int32 tabIndex) const = delete;
 
 				void	_AddTab(GTab* tab);

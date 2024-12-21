@@ -19,8 +19,8 @@ MainWindow::MainWindow()
 	BWindow(BRect(100, 100, 900, 900), "My tabs", B_TITLED_WINDOW,
 		B_ASYNCHRONOUS_CONTROLS | B_QUIT_ON_WINDOW_CLOSE)
 {
-	fTabView1 = new GenioTabView("genio_tab_view", 'GTAB', B_VERTICAL, true);
-	fTabView2 = new GenioTabView("genio_tab_view", 'GTAB', B_VERTICAL, false);
+	fTabView1 = new GenioTabView("genio_tab_view", 'GTAB', B_VERTICAL,   true);
+	fTabView2 = new GenioTabView("genio_tab_view", 'GTAB', B_VERTICAL,   true);
 	fTabView3 = new GenioTabView("genio_tab_view", 'GTAB', B_HORIZONTAL, true);
 
 	for (int32 i=0;i<3;i++) {
@@ -47,7 +47,7 @@ MainWindow::MainWindow()
 		BString text("Hor ");
 		text << i;
 		BStringView* stringView = new BStringView(label.String(), text.String());
-		fTabView3->AddTab(stringView, 2000+i);
+		fTabView3->AddTab(stringView, 3000+i);
 	}
 
 
@@ -59,6 +59,10 @@ MainWindow::MainWindow()
 		.End()
 		.Add(fTabView3)
 	;
+
+	fTabView1->SetExplicitMaxSize(BSize(64,64));
+	fTabView2->SetExplicitMaxSize(BSize(64,64));
+	fTabView3->SetExplicitMaxSize(BSize(64,64));
 }
 
 
@@ -80,11 +84,11 @@ MainWindow::MessageReceived(BMessage* message)
 		{
 			fTabView1->DebugFrame();
 			printf("-- TAB1 --\n");
-			printf("Min: "); printSize(fTabView1->MinSize());
-			printf("Max: "); printSize(fTabView1->MaxSize());
+			printf("Min: "); printSize(fTabView1->ContainerView()->MinSize());
+			printf("Max: "); printSize(fTabView1->ContainerView()->MaxSize());
 			if (fTabView1->GetLayout())
-				printf("Lay: "); printSize(fTabView1->GetLayout()->MaxSize());
-			printf("Pre: "); printSize(fTabView1->PreferredSize());
+				printf("Lay: "); printSize(fTabView1->ContainerView()->GetLayout()->MaxSize());
+			printf("Pre: "); printSize(fTabView1->ContainerView()->PreferredSize());
 			break;
 		}
 		default:
