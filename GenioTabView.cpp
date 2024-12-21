@@ -203,15 +203,17 @@ GenioTabView::MouseMoved(BPoint where, uint32 transit, const BMessage* dragMessa
 						return;
 					}
 				} else {
+					BRect frame =TabFrame(CountTabs()-1);
 					float right = 0;
 					if (CountTabs() > 0) {
-						right = TabFrame(CountTabs()-1).right;
+						right = frame.right;
 					}
 					if (where.x < right)
 						return;
 
 					BRect highlightFrame = Bounds();
 					highlightFrame.left = right;
+					highlightFrame.bottom = frame.bottom;
 
 					if (fDropTargetHighlightFrame != highlightFrame) {
 						Invalidate(fDropTargetHighlightFrame);
