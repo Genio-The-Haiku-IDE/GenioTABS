@@ -205,15 +205,17 @@ GenioTabView::MouseMoved(BPoint where, uint32 transit, const BMessage* dragMessa
 				} else {
 					BRect frame =TabFrame(CountTabs()-1);
 					float right = 0;
+					float bottom = Bounds().bottom;
 					if (CountTabs() > 0) {
 						right = frame.right;
+						bottom = frame.bottom;
 					}
 					if (where.x < right)
 						return;
 
 					BRect highlightFrame = Bounds();
 					highlightFrame.left = right;
-					highlightFrame.bottom = frame.bottom;
+					highlightFrame.bottom = bottom;
 
 					if (fDropTargetHighlightFrame != highlightFrame) {
 						Invalidate(fDropTargetHighlightFrame);
@@ -284,13 +286,13 @@ GenioTabView::MoveTabs(uint32 from, uint32 to, GenioTabView* fromTabView)
 	indexTab->SetLabel(label.String());
 	_AddTab(indexTab);
 }
-
+/*
 void
 GenioTabView::AddTab(BView* target, BTab* tab)
 {
 	BTabView::AddTab(target, tab);
 }
-
+*/
 
 void
 BTabView::AddTab(BView* target, BTab* tab)
@@ -384,6 +386,16 @@ GenioTabView::TabFrame(int32 index) const
 	}
 }
 
+
+void
+GenioTabView::FrameResized(float newWidth, float newHeight)
+{
+	if (CountTabs() > 0 && newWidth <= TabFrame(CountTabs()-1).right)
+		printf("NON ci sta -> %s \n", TabAt(CountTabs()-1)->Label());
+	BTabView::FrameResized(newWidth, newHeight);
+}
+
+
 void
 GenioTabView::DebugFrame()
 {
@@ -453,6 +465,7 @@ GenioTabView::RemoveTab(int32 tabIndex)
 		}
 	}
 
+	FrameResized(Bounds().Width(), Bounds().Height());
 	return tab;
 }
 
@@ -465,7 +478,7 @@ GenioTabView::_AddTab(GTab* tab)
 	_ChangeGroupViewDirection(tab);
 	fTabIdMap[tab->Id()] = tab;
 	BTabView::AddTab(tab->View(), tab);
-
+		FrameResized(Bounds().Width(), Bounds().Height());
 	_PrintMap();
 }
 

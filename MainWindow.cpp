@@ -84,11 +84,11 @@ MainWindow::MessageReceived(BMessage* message)
 		{
 			fTabView1->DebugFrame();
 			printf("-- TAB1 --\n");
-			printf("Min: "); printSize(fTabView1->ContainerView()->MinSize());
-			printf("Max: "); printSize(fTabView1->ContainerView()->MaxSize());
+			printf("Min: "); printSize(fTabView1->MinSize());
+			printf("Max: "); printSize(fTabView1->MaxSize());
 			if (fTabView1->GetLayout())
-				printf("Lay: "); printSize(fTabView1->ContainerView()->GetLayout()->MaxSize());
-			printf("Pre: "); printSize(fTabView1->ContainerView()->PreferredSize());
+				printf("Lay: "); printSize(fTabView1->GetLayout()->MaxSize());
+			printf("Pre: "); printSize(fTabView1->PreferredSize());
 			break;
 		}
 		default:
