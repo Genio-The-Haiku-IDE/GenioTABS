@@ -6,7 +6,7 @@
 
 #include "App.h"
 #include "MainWindow.h"
-
+#include "NeoWindow.h"
 
 const char* kApplicationSignature = "application/x-vnd.MyName-MyApp";
 
@@ -15,8 +15,8 @@ App::App()
 	:
 	BApplication(kApplicationSignature)
 {
-	MainWindow* mainwin = new MainWindow();
-	mainwin->Show();
+	//(new MainWindow())->Show();
+	(new NeoWindow())->Show();
 }
 
 
