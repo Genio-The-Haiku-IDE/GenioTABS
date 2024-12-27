@@ -35,7 +35,9 @@ SRCS =  App.cpp \
 		GenioTabView \
 		GTab \
 		NeoWindow.cpp \
-		TabView.cpp
+		TabView.cpp \
+		GTabView.cpp \
+		TabViewController.cpp
 
 
 #	Specify the resource definition files to use. Full or relative paths can be

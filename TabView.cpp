@@ -6,6 +6,7 @@
 
 #include "TabView.h"
 #include <ControlLook.h>
+#include "TabViewController.h"
 
 float GetH(){
 		static float _heigh = -1.0;
