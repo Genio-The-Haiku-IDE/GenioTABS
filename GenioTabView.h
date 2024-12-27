@@ -51,6 +51,8 @@ public:
 
 	void DebugFrame();
 
+	void				ScrollBy(float y);
+
 private:
 			using BTabView::TabAt;
 			using BTabView::Select;
@@ -84,6 +86,7 @@ private:
 		orientation			fOrientation;
 		IdMap				fTabIdMap;
 		bool				fWithCloseButtons;
+		float				fScrollByY;
 
 };
 

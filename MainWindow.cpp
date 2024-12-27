@@ -54,7 +54,11 @@ MainWindow::MainWindow()
 	BLayoutBuilder::Group<>(this, B_VERTICAL, 0.0f)
 		.AddGroup(B_HORIZONTAL, 0.0f)
 			.Add(fTabView1)
-			.Add(new BButton("Debug","Debug", new BMessage('ack!')))
+			.AddGroup(B_VERTICAL, 0.0f)
+				.Add(new BButton("Debug","Debug", new BMessage('ack!')))
+				.Add(new BButton("__","Scroll ->", new BMessage('scro')))
+				.Add(new BButton("__","Scroll <-", new BMessage('scr2')))
+			.End()
 			.Add(fTabView2)
 		.End()
 		.Add(fTabView3)
@@ -89,6 +93,16 @@ MainWindow::MessageReceived(BMessage* message)
 			if (fTabView1->GetLayout())
 				printf("Lay: "); printSize(fTabView1->GetLayout()->MaxSize());
 			printf("Pre: "); printSize(fTabView1->PreferredSize());
+			break;
+		}
+		case 'scro':
+		{
+			fTabView1->ScrollBy(50.0f);
+			break;
+		}
+		case 'scr2':
+		{
+			fTabView1->ScrollBy(-50.0f);
 			break;
 		}
 		default:

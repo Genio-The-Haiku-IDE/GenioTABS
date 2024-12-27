@@ -102,6 +102,7 @@ GenioTabView::InitiateDrag(BPoint where)
 	return false;
 }
 
+#include <Button.h>
 
 GenioTabView::GenioTabView(const char* name,
 							tab_drag_affinity affinity,
@@ -110,10 +111,10 @@ GenioTabView::GenioTabView(const char* name,
 	BTabView(name),
 	fTabAffinity(affinity),
 	fOrientation(orientation),
-	fWithCloseButtons(withCloseButtons)
+	fWithCloseButtons(withCloseButtons),
+	fScrollByY(0.0f)
 {
-	//SetTabWidth(B_WIDTH_AS_USUAL);
-	//SetTabWidth(B_WIDTH_FROM_LABEL);
+//	AddChild(new BButton(BRect(10000,0,10,30), "x", "x", nullptr, B_FOLLOW_LEFT_TOP));
 }
 
 
@@ -380,8 +381,8 @@ GenioTabView::TabFrame(int32 index) const
 	else {
 		BRect rect = BTabView::TabFrame(index);
 		//printf("-? [%d][%f] ", index, rect.Width()); rect.PrintToStream();
-		rect.left  += index * kCloseButtonWidth;
-		rect.right += (index+1) * kCloseButtonWidth;
+		rect.left  += (index * kCloseButtonWidth) + fScrollByY;
+		rect.right += ((index+1) * kCloseButtonWidth) + fScrollByY;
 		return rect;
 	}
 }
@@ -404,6 +405,13 @@ GenioTabView::DebugFrame()
 		BRect frame = TabFrame(i);
 		printf("-> [%d][%f] ", i, frame.Width()); frame.PrintToStream();
 	}
+}
+
+void
+GenioTabView::ScrollBy(float y)
+{
+	fScrollByY -= y;
+	Invalidate();
 }
 
 #include <GroupLayout.h>
