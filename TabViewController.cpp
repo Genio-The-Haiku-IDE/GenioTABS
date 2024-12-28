@@ -6,6 +6,8 @@
 
 #include "TabViewController.h"
 #include "TabView.h"
+#include "GTabView.h"
+#include <cassert>
 
 class Filler : public BView
 {
@@ -14,15 +16,21 @@ class Filler : public BView
 
 		void Draw(BRect rect)
 		{
+			BRect bounds(Bounds());
 			rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
 			uint32 borders = BControlLook::B_TOP_BORDER | BControlLook::B_BOTTOM_BORDER;
-			be_control_look->DrawInactiveTab(this, rect, rect, base, 0, borders);
+			be_control_look->DrawInactiveTab(this, bounds, rect, base, 0, borders);
 		}
 };
+//B_FRAME_EVENTS
 
-
-TabViewController::TabViewController():BGroupView(B_HORIZONTAL, 0.0f), fSelectedTab(nullptr)
+TabViewController::TabViewController(GTabView* tabView):
+	BGroupView(B_HORIZONTAL, 0.0f),
+	fSelectedTab(nullptr),
+	fGTabView(tabView),
+	fTabShift(0)
 {
+	SetFlags(Flags()|B_FRAME_EVENTS);
 	GroupLayout()->AddView(0, new Filler());
 	SetExplicitMinSize(BSize(100, GetH()));
 	SetExplicitAlignment(BAlignment(B_ALIGN_LEFT, B_ALIGN_VERTICAL_CENTER));
@@ -63,13 +71,49 @@ TabViewController::TabAt(int32 index)
 }
 
 
+int32
+TabViewController::IndexOfTab(TabView* tab)
+{
+	assert(tab);
+	return GroupLayout()->IndexOfItem(tab->LayoutItem());
+}
+
+void
+TabViewController::ShiftTabs(int32 delta)
+{
+	//printf("1) ShiftTabs %d\n", fTabShift);
+	int32 newShift = fTabShift + delta;
+	if (newShift < 0)
+		newShift = 0;
+
+	int32 max = std::max(newShift, fTabShift);
+
+	for (int32 i=0;i<max;i++) {
+		TabView* tab = TabAt(i);
+		if (i < newShift) {
+			if (tab->IsHidden() == false)
+				tab->Hide();
+		} else {
+			if (tab->IsHidden() == true)
+				tab->Show();
+		}
+	}
+
+	fTabShift = newShift;
+
+	_UpdateScrolls();
+	//printf("2) ShiftTabs %d\n", fTabShift);
+}
+
+
+
 void
 TabViewController::MouseDown(TabView* tab, BPoint where)
 {
 	if (tab == fSelectedTab)
 		return;
 
-	int32 index = GroupLayout()->IndexOfItem(tab->LayoutItem());
+	int32 index = IndexOfTab(tab);
 
 	if (fSelectedTab != nullptr)
 		fSelectedTab->Update(false, tab->IsLast(), false);
@@ -79,5 +123,44 @@ TabViewController::MouseDown(TabView* tab, BPoint where)
 	fSelectedTab = tab;
 
 	printf("INDEX %d\n", index);
+}
 
+void
+TabViewController::FrameResized(float w, float h)
+{
+	//Auto-scroll:
+	if (fTabShift > 0) {
+		//ts 1 -> 0
+		//ts 2 -> 0-1
+		int32 tox = 0;
+		TabView* last = TabAt(CountTabs()-1);
+		float right =  last->Frame().right;
+		for (int32 i=fTabShift - 1;i>=0;i--){
+			//int32 idx = fTabShift - i - 1;
+			printf("IDX %d\n", i);
+			TabView* tab = TabAt(i);
+			right =  right + tab->Frame().Width();
+			if (right < w)
+				tox--;
+			else
+				break;
+		}
+		if (tox != 0)
+			ShiftTabs(tox);
+	}
+	//end
+	_UpdateScrolls();
+	BGroupView::FrameResized(w,h);
+}
+
+void
+TabViewController::_UpdateScrolls()
+{
+	if (CountTabs() > 0) {
+		GroupLayout()->Relayout(true);
+		TabView* last = TabAt(CountTabs()-1);
+
+		if(fGTabView != nullptr)
+			fGTabView->UpdateScrollButtons(fTabShift != 0, last->Frame().right > Bounds().right);
+	}
 }

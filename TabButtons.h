@@ -14,19 +14,17 @@ float GetH();
 class TabButton : public BButton {
 public:
 	TabButton(const char* label = nullptr, BMessage* message = nullptr)
-		: BButton(label, message)
+		: BButton(label, message), fHidden(false)
 	{
 		SetExplicitAlignment(BAlignment(B_ALIGN_LEFT, B_ALIGN_VERTICAL_CENTER));
 		SetExplicitMaxSize(BSize(50, B_SIZE_UNSET));
 		SetExplicitMinSize(BSize(50, B_SIZE_UNSET));
 		SetExplicitPreferredSize(BSize(50, B_SIZE_UNSET));
-
-		fTabHeight = GetH();
 	}
 
 	virtual BSize MinSize()
 	{
-		return BSize(20, fTabHeight);
+		return BSize(20, GetH());
 	}
 
 	virtual BSize MaxSize()
@@ -41,24 +39,25 @@ public:
 
 	virtual void Draw(BRect updateRect)
 	{
-
-		BRect bounds(Bounds());
-		rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
-		uint32 flags = be_control_look->Flags(this);
-		uint32 borders = BControlLook::B_TOP_BORDER
-			| BControlLook::B_BOTTOM_BORDER;
-		be_control_look->DrawInactiveTab(this, bounds, updateRect, base,
-			0, borders);
-		if (IsEnabled()) {
-			rgb_color button = tint_color(base, 1.07);
-			be_control_look->DrawButtonBackground(this, bounds, updateRect,
-				button, flags, 0);
+		if (fHidden == false) {
+			BRect bounds(Bounds());
+			rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
+			uint32 flags = be_control_look->Flags(this);
+			uint32 borders = BControlLook::B_TOP_BORDER
+				| BControlLook::B_BOTTOM_BORDER;
+			be_control_look->DrawInactiveTab(this, bounds, updateRect, base,
+				0, borders);
+			if (IsEnabled()) {
+				rgb_color button = tint_color(base, 1.07);
+				be_control_look->DrawButtonBackground(this, bounds, updateRect,
+					button, flags, 0);
+			}
+			bounds.left = (bounds.left + bounds.right) / 2 - 6;
+			bounds.top = (bounds.top + bounds.bottom) / 2 - 6;
+			bounds.right = bounds.left + 12;
+			bounds.bottom = bounds.top + 12;
+			DrawSymbol(bounds, updateRect, base);
 		}
-		bounds.left = (bounds.left + bounds.right) / 2 - 6;
-		bounds.top = (bounds.top + bounds.bottom) / 2 - 6;
-		bounds.right = bounds.left + 12;
-		bounds.bottom = bounds.top + 12;
-		DrawSymbol(bounds, updateRect, base);
 	}
 
 	virtual void DrawSymbol(BRect frame, const BRect& updateRect,
@@ -66,7 +65,7 @@ public:
 	{
 	}
 
-	float	fTabHeight;
+	bool	fHidden;
 };
 
 

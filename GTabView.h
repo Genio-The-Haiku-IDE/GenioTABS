@@ -14,6 +14,7 @@ class ScrollLeftTabButton;
 class TabViewController;
 class ScrollRightTabButton;
 class TabMenuTabButton;
+class TabButton;
 
 class GTabView : public BGroupView
 {
@@ -22,9 +23,16 @@ class GTabView : public BGroupView
 
 		void	AddTab(const char* label);
 
+		void	UpdateScrollButtons(bool left, bool right);
+
+		void	AttachedToWindow();
+
+		void	MessageReceived(BMessage* message);
+
 	private:
 
 		void	_Init();
+		void	_SetButtonVisibility(TabButton*, bool newState);
 
 		ScrollLeftTabButton*	fScrollLeftTabButton;
 		TabViewController*		fTabViewController;
