@@ -11,7 +11,7 @@
 #include <SupportDefs.h>
 
 class ScrollLeftTabButton;
-class TabViewController;
+class TabsContainer;
 class ScrollRightTabButton;
 class TabMenuTabButton;
 class TabButton;
@@ -35,7 +35,7 @@ class GTabView : public BGroupView
 		void	_SetButtonVisibility(TabButton*, bool newState);
 
 		ScrollLeftTabButton*	fScrollLeftTabButton;
-		TabViewController*		fTabViewController;
+		TabsContainer*			fTabsContainer;
 		ScrollRightTabButton*	fScrollRightTabButton;
 		TabMenuTabButton*		fTabMenuTabButton;
 };

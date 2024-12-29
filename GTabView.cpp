@@ -7,7 +7,7 @@
 #include "GTabView.h"
 #include "TabButtons.h"
 #include "TabView.h"
-#include "TabViewController.h"
+#include "TabsContainer.h"
 
 enum {
 
@@ -19,7 +19,7 @@ enum {
 GTabView::GTabView() :
 		BGroupView(B_VERTICAL, 0.0f),
 		fScrollLeftTabButton(nullptr),
-		fTabViewController(nullptr),
+		fTabsContainer(nullptr),
 		fScrollRightTabButton(nullptr),
 		fTabMenuTabButton(nullptr)
 {
@@ -29,7 +29,7 @@ GTabView::GTabView() :
 void
 GTabView::AddTab(const char* label)
 {
-	fTabViewController->AddTab(new TabView(label, fTabViewController));
+	fTabsContainer->AddTab(new TabView(label, fTabsContainer));
 }
 
 void
@@ -45,7 +45,7 @@ GTabView::AttachedToWindow()
 {
 	fScrollLeftTabButton->SetTarget(this);
 	fScrollRightTabButton->SetTarget(this);
-	//fTabViewController->SetTarget(this);
+	//fTabsContainer->SetTarget(this);
 	fTabMenuTabButton->SetTarget(this);
 }
 
@@ -55,10 +55,10 @@ GTabView::MessageReceived(BMessage* message)
 {
 	switch(message->what) {
 		case kLeftTabButton:
-			fTabViewController->ShiftTabs(-1);
+			fTabsContainer->ShiftTabs(-1);
 		break;
 		case kRightTabButton:
-			fTabViewController->ShiftTabs(+1);
+			fTabsContainer->ShiftTabs(+1);
 		break;
 		default:
 			BGroupView::MessageReceived(message);
@@ -71,13 +71,13 @@ GTabView::_Init()
 	fScrollLeftTabButton  = new ScrollLeftTabButton(new BMessage(kLeftTabButton));
 	fScrollRightTabButton = new ScrollRightTabButton(new BMessage(kRightTabButton));
 
-	fTabViewController = new TabViewController(this);
+	fTabsContainer = new TabsContainer(this);
 	fTabMenuTabButton = new TabMenuTabButton(nullptr);
 
 	BLayoutBuilder::Group<>(this, B_VERTICAL, 0.0f)
 		.AddGroup(B_HORIZONTAL, 0.0f)
 			.Add(fScrollLeftTabButton)
-			.Add(fTabViewController)
+			.Add(fTabsContainer)
 			.AddGroup(B_HORIZONTAL, 0.0f)
 				.Add(fScrollRightTabButton)
 				.Add(fTabMenuTabButton)

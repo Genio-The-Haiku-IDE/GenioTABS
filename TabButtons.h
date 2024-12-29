@@ -10,7 +10,27 @@
 #include <Button.h>
 #include <Window.h>
 
-float GetH();
+
+class TabViewTools {
+	public:
+		static float DefaultTabHeigh() {
+			static float _heigh = -1.0;
+			if (_heigh == -1) {
+				font_height fh;
+				be_plain_font->GetHeight(&fh);
+				return ceilf(fh.ascent + fh.descent + fh.leading +
+				(be_control_look->DefaultLabelSpacing() * 1.3f));
+			}
+			return _heigh;
+		}
+
+		static void DrawTabBackground(BView* view, BRect& bounds, BRect& updateRect) {
+			rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
+			uint32 borders = BControlLook::B_TOP_BORDER | BControlLook::B_BOTTOM_BORDER;
+			be_control_look->DrawInactiveTab(view, bounds, updateRect, base, 0, borders);
+		}
+};
+
 class TabButton : public BButton {
 public:
 	TabButton(const char* label = nullptr, BMessage* message = nullptr)
@@ -24,7 +44,7 @@ public:
 
 	virtual BSize MinSize()
 	{
-		return BSize(20, GetH());
+		return BSize(20, TabViewTools::DefaultTabHeigh());
 	}
 
 	virtual BSize MaxSize()
@@ -41,13 +61,10 @@ public:
 	{
 		if (fHidden == false) {
 			BRect bounds(Bounds());
+			TabViewTools::DrawTabBackground(this, bounds, updateRect);
 			rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
-			uint32 flags = be_control_look->Flags(this);
-			uint32 borders = BControlLook::B_TOP_BORDER
-				| BControlLook::B_BOTTOM_BORDER;
-			be_control_look->DrawInactiveTab(this, bounds, updateRect, base,
-				0, borders);
 			if (IsEnabled()) {
+				uint32 flags = be_control_look->Flags(this);
 				rgb_color button = tint_color(base, 1.07);
 				be_control_look->DrawButtonBackground(this, bounds, updateRect,
 					button, flags, 0);

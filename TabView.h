@@ -16,11 +16,13 @@
 #include <typeinfo>
 #include "TabButtons.h"
 
-class TabViewController;
+class TabsContainer;
+
+//TODO: this class could derive from a BView as well.
 
 class TabView : public BControl {
 public:
-								TabView(const char* label, TabViewController* controller);
+								TabView(const char* label, TabsContainer* controller);
 	virtual						~TabView();
 
 	virtual	BSize				MinSize() override;
@@ -55,6 +57,6 @@ private:
 			bool				fIsFirst; //Not used??
 			bool				fIsLast; //Not used??
 
-			TabViewController*	fTabViewController;
+			TabsContainer*		fTabsContainer;
 			BLayoutItem*		fLayoutItem;
 };

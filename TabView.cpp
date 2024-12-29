@@ -6,27 +6,13 @@
 
 #include "TabView.h"
 #include <ControlLook.h>
-#include "TabViewController.h"
+#include "TabsContainer.h"
 
-float GetH(){
-		static float _heigh = -1.0;
-		if (_heigh == -1) {
-			font_height fh;
-			be_plain_font->GetHeight(&fh);
-			return ceilf(fh.ascent + fh.descent + fh.leading +
-			(be_control_look->DefaultLabelSpacing() * 1.3f));
-		}
-		return _heigh;
-}
-
-
-
-
-TabView::TabView(const char* label, TabViewController* controller)
+TabView::TabView(const char* label, TabsContainer* controller)
 	: BControl("_tabView_", label, nullptr, B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE),
 	fIsFirst(false),
 	fIsLast(false),
-	fTabViewController(controller)
+	fTabsContainer(controller)
 {
 }
 
@@ -49,7 +35,7 @@ TabView::MaxSize()
 {
 	float extra = be_control_look->DefaultLabelSpacing();
 	float labelWidth = 150.0f;
-	return BSize(labelWidth, GetH());
+	return BSize(labelWidth, TabViewTools::DefaultTabHeigh());
 }
 
 
@@ -122,8 +108,8 @@ TabView::DrawContents(BView* owner, BRect frame, const BRect& updateRect,
 void
 TabView::MouseDown(BPoint where)
 {
- 	if (fTabViewController)
-		fTabViewController->MouseDown(this, where);
+ 	if (fTabsContainer)
+		fTabsContainer->MouseDown(this, where);
 }
 
 

@@ -4,7 +4,7 @@
  */
 
 
-#include "TabViewController.h"
+#include "TabsContainer.h"
 #include "TabView.h"
 #include "GTabView.h"
 #include <cassert>
@@ -12,19 +12,16 @@
 class Filler : public BView
 {
 	public:
-		Filler():BView("filler", B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE)	{ }
+		Filler():BView("filler", B_WILL_DRAW /*| B_FULL_UPDATE_ON_RESIZE*/)	{ }
 
 		void Draw(BRect rect)
 		{
 			BRect bounds(Bounds());
-			rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
-			uint32 borders = BControlLook::B_TOP_BORDER | BControlLook::B_BOTTOM_BORDER;
-			be_control_look->DrawInactiveTab(this, bounds, rect, base, 0, borders);
+			TabViewTools::DrawTabBackground(this, bounds, rect);
 		}
 };
-//B_FRAME_EVENTS
 
-TabViewController::TabViewController(GTabView* tabView):
+TabsContainer::TabsContainer(GTabView* tabView):
 	BGroupView(B_HORIZONTAL, 0.0f),
 	fSelectedTab(nullptr),
 	fGTabView(tabView),
@@ -32,13 +29,13 @@ TabViewController::TabViewController(GTabView* tabView):
 {
 	SetFlags(Flags()|B_FRAME_EVENTS);
 	GroupLayout()->AddView(0, new Filler());
-	SetExplicitMinSize(BSize(100, GetH()));
+	SetExplicitMinSize(BSize(100, TabViewTools::DefaultTabHeigh()));
 	SetExplicitAlignment(BAlignment(B_ALIGN_LEFT, B_ALIGN_VERTICAL_CENTER));
 }
 
 
 void
-TabViewController::AddTab(TabView* tab)
+TabsContainer::AddTab(TabView* tab)
 {
 	BLayoutItem* item = GroupLayout()->AddView(CountTabs(), tab);
 	tab->SetLayoutItem (item);
@@ -56,13 +53,13 @@ TabViewController::AddTab(TabView* tab)
 }
 
 int32
-TabViewController::CountTabs()
+TabsContainer::CountTabs()
 {
 	return GroupLayout()->CountItems() - 1; //exclude the Filler.
 }
 
 TabView*
-TabViewController::TabAt(int32 index)
+TabsContainer::TabAt(int32 index)
 {
 	if (index < 0 || index >= CountTabs())
 		return nullptr;
@@ -72,14 +69,14 @@ TabViewController::TabAt(int32 index)
 
 
 int32
-TabViewController::IndexOfTab(TabView* tab)
+TabsContainer::IndexOfTab(TabView* tab)
 {
 	assert(tab);
 	return GroupLayout()->IndexOfItem(tab->LayoutItem());
 }
 
 void
-TabViewController::ShiftTabs(int32 delta)
+TabsContainer::ShiftTabs(int32 delta)
 {
 	//printf("1) ShiftTabs %d\n", fTabShift);
 	int32 newShift = fTabShift + delta;
@@ -108,7 +105,7 @@ TabViewController::ShiftTabs(int32 delta)
 
 
 void
-TabViewController::MouseDown(TabView* tab, BPoint where)
+TabsContainer::MouseDown(TabView* tab, BPoint where)
 {
 	if (tab == fSelectedTab)
 		return;
@@ -126,7 +123,7 @@ TabViewController::MouseDown(TabView* tab, BPoint where)
 }
 
 void
-TabViewController::FrameResized(float w, float h)
+TabsContainer::FrameResized(float w, float h)
 {
 	//Auto-scroll:
 	if (fTabShift > 0) {
@@ -154,7 +151,7 @@ TabViewController::FrameResized(float w, float h)
 }
 
 void
-TabViewController::_UpdateScrolls()
+TabsContainer::_UpdateScrolls()
 {
 	if (CountTabs() > 0) {
 		GroupLayout()->Relayout(true);

@@ -11,9 +11,9 @@
 class TabView;
 class GTabView;
 
-class TabViewController : public BGroupView {
+class TabsContainer : public BGroupView {
 public:
-	TabViewController(GTabView* tabView);
+	TabsContainer(GTabView* tabView);
 	void AddTab(TabView* tab);
 	int32 CountTabs();
 
