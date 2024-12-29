@@ -8,11 +8,12 @@
 #include <GroupView.h>
 #include <Invoker.h>
 #include <SupportDefs.h>
+#include "Draggable.h"
 
 class TabView;
 class GTabView;
 
-class TabsContainer : public BGroupView, public BInvoker {
+class TabsContainer : public BGroupView, public BInvoker, public Draggable {
 public:
 	TabsContainer(GTabView* tabView, BMessage* message = nullptr);
 	void AddTab(TabView* tab);

@@ -8,9 +8,15 @@
 #include <ControlLook.h>
 #include "TabsContainer.h"
 
+/* fix me: cleanup this! */
+#define ALPHA 			230
+#define TAB_DRAG 		'DRAG'
+#define fTabAffinity	'AFFY'
+#include <Bitmap.h>
+
 TabView::TabView(const char* label, TabsContainer* controller)
 	: BView("_tabView_", B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE),
-	fTabsContainer(controller), fIsFront(false), fLabel(label)
+	fTabsContainer(controller), fIsFront(false), fLabel(label), fTabDragging(false)
 {
 }
 
@@ -40,13 +46,26 @@ TabView::MaxSize()
 void
 TabView::Draw(BRect updateRect)
 {
-	BRect frame(Bounds());
+	DrawTab(this, updateRect);
+	if (fTabDragging) {
+		rgb_color color = ui_color(B_CONTROL_HIGHLIGHT_COLOR);
+		color.alpha = 170;
+		SetHighColor(color);
+		SetDrawingMode(B_OP_ALPHA);
+		FillRect(Bounds());
+	}
+}
+
+void
+TabView::DrawTab(BView* owner, BRect updateRect)
+{
+	BRect frame(owner->Bounds());
     if (fIsFront) {
         frame.left--;
         frame.right++;
 	}
 
-	DrawBackground(this, frame, updateRect, fIsFront);
+	DrawBackground(owner, frame, updateRect, fIsFront);
 
 	if (fIsFront) {
 		frame.top += 0.0f;
@@ -55,9 +74,8 @@ TabView::Draw(BRect updateRect)
 
 	float spacing = be_control_look->DefaultLabelSpacing();
 	frame.InsetBy(spacing, spacing / 2);
-	DrawContents(this, frame, updateRect, fIsFront);
+	DrawContents(owner, frame, updateRect, fIsFront);
 }
-
 
 void
 TabView::DrawBackground(BView* owner, BRect frame, const BRect& updateRect, bool isFront)
@@ -89,19 +107,105 @@ TabView::MouseDown(BPoint where)
 {
  	if (fTabsContainer)
 		fTabsContainer->MouseDown(this, where);
+
+	OnMouseDown(where);
 }
 
 
 void
 TabView::MouseUp(BPoint where)
 {
+	OnMouseUp(where);
+	if (fTabDragging) {
+		fTabDragging = false;
+		Invalidate();
+	}
 }
 
 
 void
 TabView::MouseMoved(BPoint where, uint32 transit, const BMessage* dragMessage)
 {
+	if (dragMessage &&
+	    dragMessage->what == TAB_DRAG /*&&
+		_ValidDragAndDrop(dragMessage, &sameTabView)*/) {
+		switch (transit) {
+			case B_ENTERED_VIEW:
+			case B_INSIDE_VIEW:
+			{
+				TabView* fromTab = (TabView*)dragMessage->GetPointer("tab_view", this);
+				fTabDragging = (fromTab != this);
+				Invalidate();
+				return;
+			}
+			break;
+			default:
+			if (fTabDragging) {
+				fTabDragging = false;
+				Invalidate();
+			}
+			break;
+		};
+	} else {
+
+		OnMouseMoved(where);
+		if (fTabDragging) {
+			fTabDragging = false;
+			Invalidate();
+		}
+	}
 }
+
+
+
+
+bool
+TabView::InitiateDrag(BPoint where)
+{
+	TabView* tab = this;
+	if (tab != nullptr) {
+		BMessage message(TAB_DRAG);
+
+		message.AddPointer("tab_view", this);
+		message.AddUInt32("tab_drag_affinity", fTabAffinity);
+		//message.AddInt32("index", index);
+
+		const BRect& updateRect = tab->Bounds();
+
+		BBitmap* dragBitmap = new BBitmap(updateRect, B_RGB32, true);
+		if (dragBitmap->IsValid()) {
+			BView* view = new BView(dragBitmap->Bounds(), "helper", B_FOLLOW_NONE, B_WILL_DRAW);
+			dragBitmap->AddChild(view);
+			dragBitmap->Lock();
+			tab->DrawTab(view, updateRect);
+			view->Sync();
+			uint8* bits = (uint8*)dragBitmap->Bits();
+			int32 height = (int32)dragBitmap->Bounds().Height() + 1;
+			int32 width = (int32)dragBitmap->Bounds().Width() + 1;
+			int32 bpr = dragBitmap->BytesPerRow();
+			for (int32 y = 0; y < height; y++, bits += bpr) {
+				uint8* line = bits + 3;
+				for (uint8* end = line + 4 * width; line < end; line += 4)
+					*line = ALPHA;
+			}
+			dragBitmap->Unlock();
+		} else {
+			delete dragBitmap;
+			dragBitmap = NULL;
+		}
+		const BRect& frame = updateRect;
+		if (dragBitmap != NULL) {
+			DragMessage(&message, dragBitmap, B_OP_ALPHA,
+				BPoint(where.x - frame.left, where.y - frame.top));
+		} else {
+			DragMessage(&message, frame, this);
+		}
+
+		return true;
+	}
+	return false;
+}
+
 
 void
 TabView::SetIsFront(bool isFront)

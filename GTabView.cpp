@@ -64,7 +64,6 @@ GTabView::MessageReceived(BMessage* message)
 			fTabsContainer->ShiftTabs(+1);
 		break;
 		case kSelectedTabButton:
-			message->PrintToStream();
 			fCardView->CardLayout()->SetVisibleItem(message->GetInt32("index", 0));
 		break;
 		default:

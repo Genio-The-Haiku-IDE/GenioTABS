@@ -108,25 +108,25 @@ TabsContainer::ShiftTabs(int32 delta)
 void
 TabsContainer::MouseDown(TabView* tab, BPoint where)
 {
-	if (tab == fSelectedTab)
-		return;
+	if (tab != fSelectedTab) {
+		int32 index = IndexOfTab(tab);
 
-	int32 index = IndexOfTab(tab);
+		if (fSelectedTab != nullptr)
+			fSelectedTab->SetIsFront(false);
 
-	if (fSelectedTab != nullptr)
-		fSelectedTab->SetIsFront(false);
+		tab->SetIsFront(true);
 
-	tab->SetIsFront(true);
-
-	fSelectedTab = tab;
+		fSelectedTab = tab;
 
 
-	if (Message() && Target()) {
-		BMessage msg = *Message();
-		msg.AddPointer("tab", tab);
-		msg.AddInt32("index", index);
-		Invoke(&msg);
+		if (Message() && Target()) {
+			BMessage msg = *Message();
+			msg.AddPointer("tab", tab);
+			msg.AddInt32("index", index);
+			Invoke(&msg);
+		}
 	}
+	OnMouseDown(where);
 }
 
 void

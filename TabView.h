@@ -15,12 +15,13 @@
 #include <cstdio>
 #include <typeinfo>
 #include "TabButtons.h"
+#include "Draggable.h"
 
 class TabsContainer;
 
 //TODO: this class could derive from a BView as well.
 
-class TabView : public BView {
+class TabView : public BView , public Draggable {
 public:
 								TabView(const char* label, TabsContainer* controller);
 	virtual						~TabView();
@@ -29,6 +30,8 @@ public:
 	virtual	BSize				MaxSize() override;
 
 			void 				Draw(BRect updateRect) override;
+
+	virtual void				DrawTab(BView* owener, BRect updateRect);
 	virtual	void				DrawBackground(BView* owner, BRect frame,
 									const BRect& updateRect, bool isFront);
 	virtual	void				DrawContents(BView* owner, BRect frame,
@@ -38,6 +41,8 @@ public:
 	virtual	void				MouseUp(BPoint where) override;
 	virtual	void				MouseMoved(BPoint where, uint32 transit,
 									const BMessage* dragMessage) override;
+
+			bool 				InitiateDrag(BPoint where) override;
 
 			void				SetIsFront(bool isFront);
 			bool				IsFront() const;
@@ -50,4 +55,5 @@ private:
 			BLayoutItem*		fLayoutItem;
 			bool				fIsFront;
 			BString				fLabel;
+			bool				fTabDragging;
 };
