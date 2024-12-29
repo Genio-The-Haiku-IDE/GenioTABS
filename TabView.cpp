@@ -9,10 +9,8 @@
 #include "TabsContainer.h"
 
 TabView::TabView(const char* label, TabsContainer* controller)
-	: BControl("_tabView_", label, nullptr, B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE),
-	fIsFirst(false),
-	fIsLast(false),
-	fTabsContainer(controller)
+	: BView("_tabView_", B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE),
+	fTabsContainer(controller), fIsFront(false), fLabel(label)
 {
 }
 
@@ -42,49 +40,31 @@ TabView::MaxSize()
 void
 TabView::Draw(BRect updateRect)
 {
-	BRect frame(Bounds()); //fLayoutItem->Frame());
-
-	if (Value() == B_CONTROL_ON) {
-		// Extend the front tab outward left/right in order to merge
-		// the frames of adjacent tabs.
-		if (!fIsFirst)
-			frame.left--;
-		if (!fIsLast)
-			frame.right++;
+	BRect frame(Bounds());
+    if (fIsFront) {
+        frame.left--;
+        frame.right++;
 	}
-	//frame.bottom++;
 
-	DrawBackground(this, frame, updateRect, fIsFirst, fIsLast,
-		Value() == B_CONTROL_ON);
+	DrawBackground(this, frame, updateRect, fIsFront);
 
-	if (Value() == B_CONTROL_ON) {
+	if (fIsFront) {
 		frame.top += 0.0f;
-		if (!fIsFirst)
-			frame.left++;
-		if (!fIsLast)
-			frame.right--;
 	} else
 		frame.top += 3.0f;
 
 	float spacing = be_control_look->DefaultLabelSpacing();
 	frame.InsetBy(spacing, spacing / 2);
-	DrawContents(this, frame, updateRect, fIsFirst, fIsLast,
-		Value() == B_CONTROL_ON);
+	DrawContents(this, frame, updateRect, fIsFront);
 }
 
 
 void
-TabView::DrawBackground(BView* owner, BRect frame, const BRect& updateRect,
-	bool isFirst, bool isLast, bool isFront)
+TabView::DrawBackground(BView* owner, BRect frame, const BRect& updateRect, bool isFront)
 {
 	rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
-	uint32 borders = BControlLook::B_TOP_BORDER
-		| BControlLook::B_BOTTOM_BORDER;
+	uint32 borders = BControlLook::B_TOP_BORDER | BControlLook::B_BOTTOM_BORDER;
 
-	if (isFirst)
-		borders |= BControlLook::B_LEFT_BORDER;
-	if (isLast)
-		borders |= BControlLook::B_RIGHT_BORDER;
 	if (isFront) {
 		be_control_look->DrawActiveTab(owner, frame, updateRect, base,
 			0, borders);
@@ -96,11 +76,10 @@ TabView::DrawBackground(BView* owner, BRect frame, const BRect& updateRect,
 
 
 void
-TabView::DrawContents(BView* owner, BRect frame, const BRect& updateRect,
-	bool isFirst, bool isLast, bool isFront)
+TabView::DrawContents(BView* owner, BRect frame, const BRect& updateRect, bool isFront)
 {
 	rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
-	be_control_look->DrawLabel(owner, Label(), frame, updateRect,
+	be_control_look->DrawLabel(owner, fLabel.String(), frame, updateRect,
 		base, 0, BAlignment(B_ALIGN_LEFT, B_ALIGN_MIDDLE));
 }
 
@@ -124,68 +103,19 @@ TabView::MouseMoved(BPoint where, uint32 transit, const BMessage* dragMessage)
 {
 }
 
-
 void
 TabView::SetIsFront(bool isFront)
 {
-	Update(fIsFirst, fIsLast, isFront);
-}
+	if (fIsFront == isFront)
+		return;
 
+	fIsFront = isFront;
+	Invalidate();
+}
 
 bool
 TabView::IsFront() const
 {
-	return Value() == B_CONTROL_ON;
+	return fIsFront;
 }
-
-
-void
-TabView::SetIsLast(bool isLast)
-{
-	Update(fIsFirst, isLast, Value() == B_CONTROL_ON);
-}
-
-
-void
-TabView::Update(bool isFirst, bool isLast, bool isFront)
-{
-	int32 control = isFront ?  B_CONTROL_ON : B_CONTROL_OFF;
-	if (fIsFirst == isFirst && fIsLast == isLast && Value() == control)
-		return;
-
-	fIsFirst = isFirst;
-	fIsLast = isLast;
-	SetValue(control);
-	Invalidate();
-}
-
-/*
-void
-TabView::SetContainerView(TabContainerView* containerView)
-{
-	fContainerView = containerView;
-}
-
-
-TabContainerView*
-TabView::ContainerView() const
-{
-	return fContainerView;
-}
-*/
-/*
-BLayoutItem*
-TabView::LayoutItem() const
-{
-	return nullptr;//TabButton::LayoutItem();
-}
-*/
-/*
-void
-TabView::SetLabel(const char* label)
-{
-	BControl::SetLabel(label);
-	Invalidate();
-}
-*/
 

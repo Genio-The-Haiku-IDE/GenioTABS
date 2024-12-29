@@ -20,7 +20,7 @@ class TabsContainer;
 
 //TODO: this class could derive from a BView as well.
 
-class TabView : public BControl {
+class TabView : public BView {
 public:
 								TabView(const char* label, TabsContainer* controller);
 	virtual						~TabView();
@@ -30,11 +30,9 @@ public:
 
 			void 				Draw(BRect updateRect) override;
 	virtual	void				DrawBackground(BView* owner, BRect frame,
-									const BRect& updateRect, bool isFirst,
-									bool isLast, bool isFront);
+									const BRect& updateRect, bool isFront);
 	virtual	void				DrawContents(BView* owner, BRect frame,
-									const BRect& updateRect, bool isFirst,
-									bool isLast, bool isFront);
+									const BRect& updateRect, bool isFront);
 
 	virtual	void				MouseDown(BPoint where) override;
 	virtual	void				MouseUp(BPoint where) override;
@@ -44,19 +42,12 @@ public:
 			void				SetIsFront(bool isFront);
 			bool				IsFront() const;
 
-			void				SetIsLast(bool isLast);	//not used..
-			bool				IsLast() const { return fIsLast; } //not used..
-
-	virtual	void				Update(bool isFirst, bool isLast,
-									bool isFront);
-
 			BLayoutItem*		LayoutItem() const { return fLayoutItem; }
 			void				SetLayoutItem(BLayoutItem* layItem) { fLayoutItem = layItem; }
 
 private:
-			bool				fIsFirst; //Not used??
-			bool				fIsLast; //Not used??
-
 			TabsContainer*		fTabsContainer;
 			BLayoutItem*		fLayoutItem;
+			bool				fIsFront;
+			BString				fLabel;
 };

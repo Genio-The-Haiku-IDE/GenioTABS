@@ -43,13 +43,13 @@ TabsContainer::AddTab(TabView* tab)
 
 	if (CountTabs() == 1) {
 		//printf("Adding %s\n", tab->Label());
-		tab->Update(false, false, true);
+		tab->SetIsFront(true);
 		fSelectedTab = tab;
 	} else {
 		TabView* prev = TabAt(CountTabs()-2);
 		//printf("Prev: %s\n", prev->Label());
-		prev->Update(false /* ?? */, false, prev == fSelectedTab);
-		tab->Update(false, false, false);
+		prev->SetIsFront(prev == fSelectedTab);
+		tab->SetIsFront(false);
 	}
 }
 
@@ -114,9 +114,9 @@ TabsContainer::MouseDown(TabView* tab, BPoint where)
 	int32 index = IndexOfTab(tab);
 
 	if (fSelectedTab != nullptr)
-		fSelectedTab->Update(false, tab->IsLast(), false);
+		fSelectedTab->SetIsFront(false);
 
-	tab->Update(false, tab->IsLast(), true);
+	tab->SetIsFront(true);
 
 	fSelectedTab = tab;
 
