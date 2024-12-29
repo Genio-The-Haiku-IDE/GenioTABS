@@ -12,7 +12,8 @@
 enum {
 
 	kLeftTabButton	= 'GTlb',
-	kRightTabButton = 'GTrb'
+	kRightTabButton = 'GTrb',
+	kSelectedTabButton = 'GTse'
 
 };
 
@@ -21,15 +22,17 @@ GTabView::GTabView() :
 		fScrollLeftTabButton(nullptr),
 		fTabsContainer(nullptr),
 		fScrollRightTabButton(nullptr),
-		fTabMenuTabButton(nullptr)
+		fTabMenuTabButton(nullptr),
+		fCardView(nullptr)
 {
 	_Init();
 }
 
 void
-GTabView::AddTab(const char* label)
+GTabView::AddTab(const char* label, BView* view)
 {
 	fTabsContainer->AddTab(new TabView(label, fTabsContainer));
+	fCardView->AddChild(view);
 }
 
 void
@@ -45,7 +48,7 @@ GTabView::AttachedToWindow()
 {
 	fScrollLeftTabButton->SetTarget(this);
 	fScrollRightTabButton->SetTarget(this);
-	//fTabsContainer->SetTarget(this);
+	fTabsContainer->SetTarget(this);
 	fTabMenuTabButton->SetTarget(this);
 }
 
@@ -60,6 +63,10 @@ GTabView::MessageReceived(BMessage* message)
 		case kRightTabButton:
 			fTabsContainer->ShiftTabs(+1);
 		break;
+		case kSelectedTabButton:
+			message->PrintToStream();
+			fCardView->CardLayout()->SetVisibleItem(message->GetInt32("index", 0));
+		break;
 		default:
 			BGroupView::MessageReceived(message);
 	};
@@ -71,8 +78,10 @@ GTabView::_Init()
 	fScrollLeftTabButton  = new ScrollLeftTabButton(new BMessage(kLeftTabButton));
 	fScrollRightTabButton = new ScrollRightTabButton(new BMessage(kRightTabButton));
 
-	fTabsContainer = new TabsContainer(this);
+	fTabsContainer = new TabsContainer(this, new BMessage(kSelectedTabButton));
 	fTabMenuTabButton = new TabMenuTabButton(nullptr);
+
+	fCardView = new BCardView("_cardview_");
 
 	BLayoutBuilder::Group<>(this, B_VERTICAL, 0.0f)
 		.AddGroup(B_HORIZONTAL, 0.0f)
@@ -85,8 +94,8 @@ GTabView::_Init()
 				.End()
 			.SetExplicitAlignment(BAlignment(B_ALIGN_USE_FULL_WIDTH, B_ALIGN_VERTICAL_UNSET))
 			.End()
-		.AddGlue(1)
-		.Add(new BStringView("test", "text", B_WILL_DRAW))
+		.Add(fCardView)
+		//.Add(new BStringView("test", "text", B_WILL_DRAW))
 		.AddGlue(1)
 		;
 

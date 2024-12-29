@@ -28,7 +28,7 @@ NeoWindow::NeoWindow()
 	for(int32 i=0;i<10;i++) {
 		BString label("Tab");
 		label << i;
-		tab1->AddTab(label.String());
+		tab1->AddTab(label.String(), new BStringView("test", label.String(), B_WILL_DRAW));
 	}
 }
 

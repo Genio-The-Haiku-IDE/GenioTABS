@@ -9,6 +9,7 @@
 #include <LayoutBuilder.h>
 #include <StringView.h>
 #include <SupportDefs.h>
+#include <CardView.h>
 
 class ScrollLeftTabButton;
 class TabsContainer;
@@ -21,7 +22,7 @@ class GTabView : public BGroupView
 	public:
 		GTabView();
 
-		void	AddTab(const char* label);
+		void	AddTab(const char* label, BView* view);
 
 		void	UpdateScrollButtons(bool left, bool right);
 
@@ -38,5 +39,6 @@ class GTabView : public BGroupView
 		TabsContainer*			fTabsContainer;
 		ScrollRightTabButton*	fScrollRightTabButton;
 		TabMenuTabButton*		fTabMenuTabButton;
+		BCardView*				fCardView;
 };
 

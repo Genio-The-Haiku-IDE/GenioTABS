@@ -21,8 +21,9 @@ class Filler : public BView
 		}
 };
 
-TabsContainer::TabsContainer(GTabView* tabView):
+TabsContainer::TabsContainer(GTabView* tabView, BMessage* message):
 	BGroupView(B_HORIZONTAL, 0.0f),
+	BInvoker(message, nullptr, nullptr),
 	fSelectedTab(nullptr),
 	fGTabView(tabView),
 	fTabShift(0)
@@ -41,12 +42,12 @@ TabsContainer::AddTab(TabView* tab)
 	tab->SetLayoutItem (item);
 
 	if (CountTabs() == 1) {
-		printf("Adding %s\n", tab->Label());
+		//printf("Adding %s\n", tab->Label());
 		tab->Update(false, false, true);
 		fSelectedTab = tab;
 	} else {
 		TabView* prev = TabAt(CountTabs()-2);
-		printf("Prev: %s\n", prev->Label());
+		//printf("Prev: %s\n", prev->Label());
 		prev->Update(false /* ?? */, false, prev == fSelectedTab);
 		tab->Update(false, false, false);
 	}
@@ -119,7 +120,13 @@ TabsContainer::MouseDown(TabView* tab, BPoint where)
 
 	fSelectedTab = tab;
 
-	printf("INDEX %d\n", index);
+
+	if (Message() && Target()) {
+		BMessage msg = *Message();
+		msg.AddPointer("tab", tab);
+		msg.AddInt32("index", index);
+		Invoke(&msg);
+	}
 }
 
 void
@@ -134,7 +141,7 @@ TabsContainer::FrameResized(float w, float h)
 		float right =  last->Frame().right;
 		for (int32 i=fTabShift - 1;i>=0;i--){
 			//int32 idx = fTabShift - i - 1;
-			printf("IDX %d\n", i);
+//			printf("IDX %d\n", i);
 			TabView* tab = TabAt(i);
 			right =  right + tab->Frame().Width();
 			if (right < w)

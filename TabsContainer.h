@@ -6,14 +6,15 @@
 
 
 #include <GroupView.h>
+#include <Invoker.h>
 #include <SupportDefs.h>
 
 class TabView;
 class GTabView;
 
-class TabsContainer : public BGroupView {
+class TabsContainer : public BGroupView, public BInvoker {
 public:
-	TabsContainer(GTabView* tabView);
+	TabsContainer(GTabView* tabView, BMessage* message = nullptr);
 	void AddTab(TabView* tab);
 	int32 CountTabs();
 
