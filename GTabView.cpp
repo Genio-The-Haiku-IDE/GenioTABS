@@ -17,13 +17,14 @@ enum {
 
 };
 
-GTabView::GTabView() :
+GTabView::GTabView(bool closeButton) :
 		BGroupView(B_VERTICAL, 0.0f),
 		fScrollLeftTabButton(nullptr),
 		fTabsContainer(nullptr),
 		fScrollRightTabButton(nullptr),
 		fTabMenuTabButton(nullptr),
-		fCardView(nullptr)
+		fCardView(nullptr),
+		fCloseButton(closeButton)
 {
 	_Init();
 }
@@ -31,7 +32,7 @@ GTabView::GTabView() :
 void
 GTabView::AddTab(const char* label, BView* view)
 {
-	fTabsContainer->AddTab(new TabView(label, fTabsContainer));
+	fTabsContainer->AddTab(CreateTabView(label));
 	fCardView->AddChild(view);
 }
 
@@ -138,10 +139,18 @@ GTabView::MoveTabs(TabView* fromTab, TabView* toTab, TabsContainer* fromContaine
 	TabView* removedTab = fromContainer->RemoveTab(fromTab);
 	delete removedTab;
 
-	TabView* newTab = new TabView(label.String(), fTabsContainer);
+	TabView* newTab = CreateTabView(label.String());
 	fTabsContainer->AddTab(newTab, toIndex);
 	fCardView->CardLayout()->AddItem(toIndex, fromLayout);
 	fTabsContainer->SelectTab(newTab);
+}
+
+
+TabView*
+GTabView::CreateTabView(const char* label)
+{
+	return fCloseButton ? new TabViewCloseButton(label, fTabsContainer)
+						: new TabView(label, fTabsContainer);
 }
 
 

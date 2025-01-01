@@ -18,10 +18,20 @@ class TabViewTools {
 			if (_heigh == -1) {
 				font_height fh;
 				be_plain_font->GetHeight(&fh);
-				return ceilf(fh.ascent + fh.descent + fh.leading +
+				_heigh = ceilf(fh.ascent + fh.descent + fh.leading +
 				(be_control_look->DefaultLabelSpacing() * 1.3f));
 			}
 			return _heigh;
+		}
+
+		static float DefaultFontDescent() {
+			static float _desc = -1.0;
+			if (_desc == -1) {
+				font_height fh;
+				be_plain_font->GetHeight(&fh);
+				_desc = fh.descent;
+			}
+			return _desc;
 		}
 
 		static void DrawTabBackground(BView* view, BRect& bounds, BRect& updateRect) {

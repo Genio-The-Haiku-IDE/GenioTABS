@@ -34,7 +34,6 @@ TabView::MinSize()
 BSize
 TabView::MaxSize()
 {
-	float extra = be_control_look->DefaultLabelSpacing();
 	float labelWidth = 150.0f;
 	return BSize(labelWidth, TabViewTools::DefaultTabHeigh());
 }
@@ -250,6 +249,145 @@ TabView::_ValidDragAndDrop(const BMessage* message)
 	return fTabsContainer->GetAffinity() == fromContainer->GetAffinity();
 }
 
+
+///////////////////////////////////////////////////////////////////////////////
+
+//TODO MOve in TabUtils.
+#define kCloseButtonWidth 19.0f
+const int32 kBrightnessBreakValue = 126;
+
+static void inline
+IncreaseContrastBy(float& tint, const float& value, const int& brightness)
+{
+	tint *= 1 + ((brightness >= kBrightnessBreakValue) ? +1 : -1) * value;
+}
+
+
+//FIX: we should better understand how to extend the default sizes.
+BSize
+TabViewCloseButton::MinSize()
+{
+	return TabView::MinSize();
+}
+
+BSize
+TabViewCloseButton::MaxSize()
+{
+	BSize s(TabView::MaxSize());
+	//s.width += kCloseButtonWidth;
+	return s;
+}
+
+
+void
+TabViewCloseButton::DrawContents(BView* owner, BRect frame,
+										const BRect& updateRect, bool isFront)
+{
+	BRect labelFrame = frame;
+	labelFrame.right -= kCloseButtonWidth;
+	TabView::DrawContents(owner, labelFrame, updateRect, isFront);
+	frame.left = labelFrame.right;
+	DrawCloseButton(owner, frame, updateRect, isFront);
+	return;
+}
+
+
+void
+TabViewCloseButton::MouseDown(BPoint where)
+{
+	BRect closeRect = RectCloseButton();
+	bool inside = closeRect.Contains(where);
+	if (inside != fClicked) {
+		fClicked = inside;
+		Invalidate(closeRect);
+		return;
+	}
+	TabView::MouseDown(where);
+}
+
+void
+TabViewCloseButton::MouseUp(BPoint where)
+{
+	if (fClicked) {
+		fClicked = false;
+		Invalidate();
+		return;
+	}
+	TabView::MouseUp(where);
+}
+
+
+
+void
+TabViewCloseButton::MouseMoved(BPoint where, uint32 transit,
+										const BMessage* dragMessage)
+{
+	TabView::MouseMoved(where, transit, dragMessage);
+	if (dragMessage == nullptr) {
+		BRect closeRect = RectCloseButton();
+		bool inside = closeRect.Contains(where);
+		if (inside != fOverCloseRect) {
+			fOverCloseRect = inside;
+			if (inside == false)
+				fClicked = false;
+			Invalidate(closeRect);
+		}
+	}
+}
+
+
+BRect
+TabViewCloseButton::RectCloseButton()
+{
+	BRect frame  = Bounds();
+	frame.right -= be_control_look->DefaultLabelSpacing();
+	frame.left = frame.right - kCloseButtonWidth + 3;
+	frame.bottom -= be_control_look->DefaultLabelSpacing()/2 + TabViewTools::DefaultFontDescent() - 2;
+	frame.top = frame.bottom - frame.Width();
+	return frame;
+}
+
+
+void
+TabViewCloseButton::DrawCloseButton(BView* owner, BRect buttonRect, const BRect& updateRect,
+							bool isFront)
+{
+	BRect closeRect = RectCloseButton();
+	rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
+	float tint = B_LIGHTEN_1_TINT;
+	if (base.Brightness() >= kBrightnessBreakValue) {
+		tint = B_DARKEN_1_TINT *1.2;
+	}
+
+	if (fOverCloseRect) {
+		// Draw the button frame
+		be_control_look->DrawButtonFrame(owner, closeRect, updateRect,
+			base, base,
+			BControlLook::B_ACTIVATED | BControlLook::B_BLEND_FRAME);
+
+		rgb_color background = ui_color(B_PANEL_BACKGROUND_COLOR);
+		be_control_look->DrawButtonBackground(owner, closeRect, updateRect,
+			background, BControlLook::B_ACTIVATED);
+	} else {
+		closeRect.top += 4;
+		closeRect.left += 4;
+		closeRect.right -= 2;
+		closeRect.bottom -= 2;
+	}
+
+	// Draw the ×
+	if (fClicked)
+		IncreaseContrastBy(tint, .2, base.Brightness());
+
+	base = tint_color(base, tint);
+	owner->SetHighColor(base);
+	owner->SetPenSize(2);
+
+	owner->StrokeLine(closeRect.LeftTop(), closeRect.RightBottom());
+	owner->StrokeLine(closeRect.LeftBottom(), closeRect.RightTop());
+	owner->SetPenSize(1);
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 Filler::Filler(TabsContainer* tabsContainer)
@@ -289,7 +427,7 @@ Filler::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
 		case TAB_DRAG:
-			/*if(_ValidDragAndDrop(message))*/
+			if(_ValidDragAndDrop(message))
 				fTabsContainer->OnDropTab(nullptr, message);
 		break;
 		default:
@@ -298,19 +436,34 @@ Filler::MessageReceived(BMessage* message)
 	};
 }
 
+bool
+Filler::_ValidDragAndDrop(const BMessage* message)
+{
+	TabView*		fromTab = (TabView*)message->GetPointer("tab_view", nullptr);
+	TabsContainer*	fromContainer = (TabsContainer*)message->GetPointer("tab_container", nullptr);
+
+	if (fromTab == nullptr || fromContainer == nullptr)
+		return false;
+
+	if (fTabsContainer->GetAffinity() == 0 || fromContainer->GetAffinity() == 0)
+		return false;
+
+
+	return fTabsContainer->GetAffinity() == fromContainer->GetAffinity();
+}
+
 
 void
 Filler::MouseMoved(BPoint where, uint32 transit, const BMessage* dragMessage)
 {
 	if (dragMessage &&
-		dragMessage->what == TAB_DRAG /*&&
-		_ValidDragAndDrop(dragMessage)*/) {
+		dragMessage->what == TAB_DRAG &&
+		_ValidDragAndDrop(dragMessage)) {
 		switch (transit) {
 			case B_ENTERED_VIEW:
 			case B_INSIDE_VIEW:
 			{
-				//TabView* fromTab = (TabView*)dragMessage->GetPointer("tab_view", this);
-				fTabDragging = true;//(fromTab != this);
+				fTabDragging = true;
 				Invalidate();
 				return;
 			}
@@ -323,7 +476,6 @@ Filler::MouseMoved(BPoint where, uint32 transit, const BMessage* dragMessage)
 			break;
 		};
 	} else {
-
 		if (fTabDragging) {
 			fTabDragging = false;
 			Invalidate();

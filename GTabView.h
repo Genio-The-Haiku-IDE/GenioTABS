@@ -21,7 +21,7 @@ class TabView;
 class GTabView : public BGroupView
 {
 	public:
-		GTabView();
+		GTabView(bool closeButton);
 
 		void	AddTab(const char* label, BView* view);
 
@@ -35,13 +35,19 @@ class GTabView : public BGroupView
 
 	private:
 
+		virtual TabView*	CreateTabView(const char* label);
+
+	private:
+
 		void	_Init();
 		void	_SetButtonVisibility(TabButton*, bool newState);
+
 
 		ScrollLeftTabButton*	fScrollLeftTabButton;
 		TabsContainer*			fTabsContainer;
 		ScrollRightTabButton*	fScrollRightTabButton;
 		TabMenuTabButton*		fTabMenuTabButton;
 		BCardView*				fCardView;
+		bool					fCloseButton;
 };
 

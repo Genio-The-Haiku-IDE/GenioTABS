@@ -64,6 +64,31 @@ private:
 			bool				fTabDragging;
 };
 
+class TabViewCloseButton : public TabView {
+public:
+	  using TabView::TabView;
+
+		virtual	BSize		MinSize() override;
+		virtual	BSize		MaxSize() override;
+		virtual	void		DrawContents(BView* owner, BRect frame,
+										const BRect& updateRect, bool isFront) override;
+		virtual	void		MouseDown(BPoint where) override;
+		virtual	void		MouseUp(BPoint where) override;
+		virtual	void		MouseMoved(BPoint where, uint32 transit,
+										const BMessage* dragMessage) override;
+private:
+				void		DrawCloseButton(BView* owner, BRect butFrame, const BRect& updateRect,
+											bool isFront);
+
+				BRect		RectCloseButton();
+
+
+private:
+
+				bool fOverCloseRect = false;
+				bool fClicked = false;
+};
+
 
 class Filler : public BView
 {
@@ -78,10 +103,13 @@ class Filler : public BView
 		void	MessageReceived(BMessage* message) override;
 
 
-		void MouseMoved(BPoint where, uint32 transit,
+		void 	MouseMoved(BPoint where, uint32 transit,
 									const BMessage* dragMessage) override;
 
 	private:
+
+		bool	_ValidDragAndDrop(const BMessage* message);
+
 		bool				fTabDragging;
 		TabsContainer*		fTabsContainer;
 };
