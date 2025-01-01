@@ -16,6 +16,7 @@ class TabsContainer;
 class ScrollRightTabButton;
 class TabMenuTabButton;
 class TabButton;
+class TabView;
 
 class GTabView : public BGroupView
 {
@@ -29,6 +30,8 @@ class GTabView : public BGroupView
 		void	AttachedToWindow();
 
 		void	MessageReceived(BMessage* message);
+
+		void	MoveTabs(TabView* fromTab, TabView* toTab, TabsContainer* fromContainer);
 
 	private:
 

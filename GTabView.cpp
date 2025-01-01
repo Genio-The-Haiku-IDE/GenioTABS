@@ -64,7 +64,11 @@ GTabView::MessageReceived(BMessage* message)
 			fTabsContainer->ShiftTabs(+1);
 		break;
 		case kSelectedTabButton:
-			fCardView->CardLayout()->SetVisibleItem(message->GetInt32("index", 0));
+		{
+			int32 index = message->GetInt32("index", 0);
+			if (index > -1)
+				fCardView->CardLayout()->SetVisibleItem(index);
+		}
 		break;
 		default:
 			BGroupView::MessageReceived(message);
@@ -81,6 +85,8 @@ GTabView::_Init()
 	fTabMenuTabButton = new TabMenuTabButton(nullptr);
 
 	fCardView = new BCardView("_cardview_");
+
+	fTabsContainer->SetAffinity('AFFY');
 
 	BLayoutBuilder::Group<>(this, B_VERTICAL, 0.0f)
 		.AddGroup(B_HORIZONTAL, 0.0f)
@@ -110,4 +116,38 @@ GTabView::_SetButtonVisibility(TabButton* button, bool newState)
 	} else if (newState == true  && button->IsHidden())
 			button->Show();
 }
+
+
+void
+GTabView::MoveTabs(TabView* fromTab, TabView* toTab, TabsContainer* fromContainer)
+{
+	//Remove the View from CardView
+	int32 fromIndex = fromContainer->IndexOfTab(fromTab);
+	int32 toIndex = fTabsContainer->IndexOfTab(toTab);
+
+	BLayoutItem* fromLayout = fCardView->CardLayout()->ItemAt(fromIndex);
+	BView*	fromView = fromLayout->View();
+	if (!fromView)
+		return;
+
+	fromView->RemoveSelf();
+
+	fCardView->CardLayout()->RemoveItem(fromLayout);
+
+	BString label = fromTab->Label(); //TODO copy all the props
+	TabView* removedTab = fromContainer->RemoveTab(fromTab);
+	delete removedTab;
+
+	TabView* newTab = new TabView(label.String(), fTabsContainer);
+	fTabsContainer->AddTab(newTab, toIndex);
+	fCardView->CardLayout()->AddItem(toIndex, fromLayout);
+	fTabsContainer->SelectTab(newTab);
+}
+
+
+
+
+
+
+
 

@@ -7,12 +7,9 @@
 #include "TabView.h"
 #include <ControlLook.h>
 #include "TabsContainer.h"
-
-/* fix me: cleanup this! */
-#define ALPHA 			230
-#define TAB_DRAG 		'DRAG'
-#define fTabAffinity	'AFFY'
 #include <Bitmap.h>
+
+#define ALPHA 			200
 
 TabView::TabView(const char* label, TabsContainer* controller)
 	: BView("_tabView_", B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE),
@@ -127,8 +124,8 @@ void
 TabView::MouseMoved(BPoint where, uint32 transit, const BMessage* dragMessage)
 {
 	if (dragMessage &&
-	    dragMessage->what == TAB_DRAG /*&&
-		_ValidDragAndDrop(dragMessage, &sameTabView)*/) {
+	    dragMessage->what == TAB_DRAG &&
+		_ValidDragAndDrop(dragMessage)) {
 		switch (transit) {
 			case B_ENTERED_VIEW:
 			case B_INSIDE_VIEW:
@@ -157,6 +154,20 @@ TabView::MouseMoved(BPoint where, uint32 transit, const BMessage* dragMessage)
 }
 
 
+void
+TabView::MessageReceived(BMessage* message)
+{
+	switch (message->what) {
+		case TAB_DRAG:
+			if(_ValidDragAndDrop(message))
+				fTabsContainer->OnDropTab(this, message);
+		break;
+		default:
+			BView::MessageReceived(message);
+		break;
+	};
+}
+
 
 
 bool
@@ -167,8 +178,7 @@ TabView::InitiateDrag(BPoint where)
 		BMessage message(TAB_DRAG);
 
 		message.AddPointer("tab_view", this);
-		message.AddUInt32("tab_drag_affinity", fTabAffinity);
-		//message.AddInt32("index", index);
+		message.AddPointer("tab_container", fTabsContainer);
 
 		const BRect& updateRect = tab->Bounds();
 
@@ -223,3 +233,28 @@ TabView::IsFront() const
 	return fIsFront;
 }
 
+
+bool
+TabView::_ValidDragAndDrop(const BMessage* message)
+{/*
+	if (sameTabView)
+		*sameTabView = (msg->GetPointer("genio_tab_view", nullptr) == this);
+
+	if (fTabAffinity == 0 && msg->GetPointer("genio_tab_view", nullptr) != this)
+		return false;
+
+	if (msg->GetUInt32("tab_drag_affinity", 0) != fTabAffinity)
+		return false;
+*/
+	TabView*		fromTab = (TabView*)message->GetPointer("tab_view", nullptr);
+	TabsContainer*	fromContainer = (TabsContainer*)message->GetPointer("tab_container", nullptr);
+
+	if (fromTab == nullptr || fromContainer == nullptr)
+		return false;
+
+	if (fTabsContainer->GetAffinity() == 0 || fromContainer->GetAffinity() == 0)
+		return false;
+
+
+	return fTabsContainer->GetAffinity() == fromContainer->GetAffinity();
+}

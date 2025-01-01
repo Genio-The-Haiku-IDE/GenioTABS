@@ -26,7 +26,8 @@ TabsContainer::TabsContainer(GTabView* tabView, BMessage* message):
 	BInvoker(message, nullptr, nullptr),
 	fSelectedTab(nullptr),
 	fGTabView(tabView),
-	fTabShift(0)
+	fTabShift(0),
+	fAffinity(0)
 {
 	SetFlags(Flags()|B_FRAME_EVENTS);
 	GroupLayout()->AddView(0, new Filler());
@@ -36,21 +37,18 @@ TabsContainer::TabsContainer(GTabView* tabView, BMessage* message):
 
 
 void
-TabsContainer::AddTab(TabView* tab)
+TabsContainer::AddTab(TabView* tab, int32 index, bool select)
 {
-	BLayoutItem* item = GroupLayout()->AddView(CountTabs(), tab);
+	if (index == -1)
+		index = CountTabs();
+
+	BLayoutItem* item = GroupLayout()->AddView(index, tab);
 	tab->SetLayoutItem (item);
 
-	if (CountTabs() == 1) {
-		//printf("Adding %s\n", tab->Label());
-		tab->SetIsFront(true);
-		fSelectedTab = tab;
-	} else {
-		TabView* prev = TabAt(CountTabs()-2);
-		//printf("Prev: %s\n", prev->Label());
-		prev->SetIsFront(prev == fSelectedTab);
-		tab->SetIsFront(false);
+	if (select || CountTabs() == 1) {
+		SelectTab(tab);
 	}
+
 }
 
 int32
@@ -72,9 +70,60 @@ TabsContainer::TabAt(int32 index)
 int32
 TabsContainer::IndexOfTab(TabView* tab)
 {
-	assert(tab);
+	if (fSelectedTab == nullptr)
+		return -1;
 	return GroupLayout()->IndexOfItem(tab->LayoutItem());
 }
+
+
+TabView*
+TabsContainer::RemoveTab(TabView* tab)
+{
+	tab->LayoutItem()->RemoveSelf();
+	tab->RemoveSelf();
+
+
+	if (CountTabs() == 0) {
+		SelectTab(nullptr);
+	} else {
+		SelectTab(TabAt(0));
+	}
+
+	delete tab->LayoutItem();
+	tab->SetLayoutItem(nullptr);
+	return tab;
+}
+
+
+TabView*
+TabsContainer::SelectedTab()
+{
+	return fSelectedTab;
+}
+
+
+void
+TabsContainer::SelectTab(TabView* tab, bool invoke)
+{
+	if (tab != fSelectedTab) {
+		if (fSelectedTab)
+			fSelectedTab->SetIsFront(false);
+
+		fSelectedTab = tab;
+
+		if (fSelectedTab)
+			fSelectedTab->SetIsFront(true);
+
+		if (invoke && Message() && Target()) {
+			BMessage msg = *Message();
+			msg.AddPointer("tab", fSelectedTab);
+			msg.AddInt32("index", IndexOfTab(fSelectedTab));
+			Invoke(&msg);
+		}
+	}
+}
+
+
 
 void
 TabsContainer::ShiftTabs(int32 delta)
@@ -108,24 +157,7 @@ TabsContainer::ShiftTabs(int32 delta)
 void
 TabsContainer::MouseDown(TabView* tab, BPoint where)
 {
-	if (tab != fSelectedTab) {
-		int32 index = IndexOfTab(tab);
-
-		if (fSelectedTab != nullptr)
-			fSelectedTab->SetIsFront(false);
-
-		tab->SetIsFront(true);
-
-		fSelectedTab = tab;
-
-
-		if (Message() && Target()) {
-			BMessage msg = *Message();
-			msg.AddPointer("tab", tab);
-			msg.AddInt32("index", index);
-			Invoke(&msg);
-		}
-	}
+	SelectTab(tab);
 	OnMouseDown(where);
 }
 
@@ -158,6 +190,19 @@ TabsContainer::FrameResized(float w, float h)
 }
 
 void
+TabsContainer::OnDropTab(TabView* toTab, BMessage* message)
+{
+	TabView*		fromTab = (TabView*)message->GetPointer("tab_view", nullptr);
+	TabsContainer*	fromContainer = (TabsContainer*)message->GetPointer("tab_container", nullptr);
+
+	if (fromTab == nullptr || fromContainer == nullptr || toTab == fromTab)
+		return;
+
+	fGTabView->MoveTabs(fromTab, toTab, fromContainer);
+}
+
+
+void
 TabsContainer::_UpdateScrolls()
 {
 	if (CountTabs() > 0) {
@@ -168,3 +213,4 @@ TabsContainer::_UpdateScrolls()
 			fGTabView->UpdateScrollButtons(fTabShift != 0, last->Frame().right > Bounds().right);
 	}
 }
+

@@ -19,6 +19,8 @@
 
 class TabsContainer;
 
+#define TAB_DRAG 		'DRAG'
+
 //TODO: this class could derive from a BView as well.
 
 class TabView : public BView , public Draggable {
@@ -42,6 +44,8 @@ public:
 	virtual	void				MouseMoved(BPoint where, uint32 transit,
 									const BMessage* dragMessage) override;
 
+	virtual	void				MessageReceived(BMessage* message) override;
+
 			bool 				InitiateDrag(BPoint where) override;
 
 			void				SetIsFront(bool isFront);
@@ -50,7 +54,11 @@ public:
 			BLayoutItem*		LayoutItem() const { return fLayoutItem; }
 			void				SetLayoutItem(BLayoutItem* layItem) { fLayoutItem = layItem; }
 
+			BString				Label() { return fLabel; };
+
 private:
+			bool				_ValidDragAndDrop(const BMessage* msg);
+
 			TabsContainer*		fTabsContainer;
 			BLayoutItem*		fLayoutItem;
 			bool				fIsFront;
