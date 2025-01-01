@@ -26,8 +26,8 @@ NeoWindow::NeoWindow()
 		.Add(tab1);
 
 	for(int32 i=0;i<10;i++) {
-		BString label("Very long tab name");
-		label << i;
+		BString label;
+		label << i << " Very long tab name";
 		tab1->AddTab(label.String(), new BStringView("test", label.String(), B_WILL_DRAW));
 	}
 }
