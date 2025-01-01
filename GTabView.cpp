@@ -123,7 +123,7 @@ GTabView::MoveTabs(TabView* fromTab, TabView* toTab, TabsContainer* fromContaine
 {
 	//Remove the View from CardView
 	int32 fromIndex = fromContainer->IndexOfTab(fromTab);
-	int32 toIndex = fTabsContainer->IndexOfTab(toTab);
+	int32 toIndex = toTab == nullptr ? fTabsContainer->CountTabs() -1 : fTabsContainer->IndexOfTab(toTab);
 
 	BLayoutItem* fromLayout = fCardView->CardLayout()->ItemAt(fromIndex);
 	BView*	fromView = fromLayout->View();

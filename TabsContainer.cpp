@@ -9,18 +9,6 @@
 #include "GTabView.h"
 #include <cassert>
 
-class Filler : public BView
-{
-	public:
-		Filler():BView("filler", B_WILL_DRAW /*| B_FULL_UPDATE_ON_RESIZE*/)	{ }
-
-		void Draw(BRect rect)
-		{
-			BRect bounds(Bounds());
-			TabViewTools::DrawTabBackground(this, bounds, rect);
-		}
-};
-
 TabsContainer::TabsContainer(GTabView* tabView, BMessage* message):
 	BGroupView(B_HORIZONTAL, 0.0f),
 	BInvoker(message, nullptr, nullptr),
@@ -30,7 +18,7 @@ TabsContainer::TabsContainer(GTabView* tabView, BMessage* message):
 	fAffinity(0)
 {
 	SetFlags(Flags()|B_FRAME_EVENTS);
-	GroupLayout()->AddView(0, new Filler());
+	GroupLayout()->AddView(0, new Filler(this));
 	SetExplicitMinSize(BSize(100, TabViewTools::DefaultTabHeigh()));
 	SetExplicitAlignment(BAlignment(B_ALIGN_LEFT, B_ALIGN_VERTICAL_CENTER));
 }
@@ -128,7 +116,6 @@ TabsContainer::SelectTab(TabView* tab, bool invoke)
 void
 TabsContainer::ShiftTabs(int32 delta)
 {
-	//printf("1) ShiftTabs %d\n", fTabShift);
 	int32 newShift = fTabShift + delta;
 	if (newShift < 0)
 		newShift = 0;
@@ -145,11 +132,8 @@ TabsContainer::ShiftTabs(int32 delta)
 				tab->Show();
 		}
 	}
-
 	fTabShift = newShift;
-
 	_UpdateScrolls();
-	//printf("2) ShiftTabs %d\n", fTabShift);
 }
 
 
@@ -166,14 +150,10 @@ TabsContainer::FrameResized(float w, float h)
 {
 	//Auto-scroll:
 	if (fTabShift > 0) {
-		//ts 1 -> 0
-		//ts 2 -> 0-1
 		int32 tox = 0;
 		TabView* last = TabAt(CountTabs()-1);
 		float right =  last->Frame().right;
 		for (int32 i=fTabShift - 1;i>=0;i--){
-			//int32 idx = fTabShift - i - 1;
-//			printf("IDX %d\n", i);
 			TabView* tab = TabAt(i);
 			right =  right + tab->Frame().Width();
 			if (right < w)

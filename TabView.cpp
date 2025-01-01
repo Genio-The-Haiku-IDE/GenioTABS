@@ -236,16 +236,7 @@ TabView::IsFront() const
 
 bool
 TabView::_ValidDragAndDrop(const BMessage* message)
-{/*
-	if (sameTabView)
-		*sameTabView = (msg->GetPointer("genio_tab_view", nullptr) == this);
-
-	if (fTabAffinity == 0 && msg->GetPointer("genio_tab_view", nullptr) != this)
-		return false;
-
-	if (msg->GetUInt32("tab_drag_affinity", 0) != fTabAffinity)
-		return false;
-*/
+{
 	TabView*		fromTab = (TabView*)message->GetPointer("tab_view", nullptr);
 	TabsContainer*	fromContainer = (TabsContainer*)message->GetPointer("tab_container", nullptr);
 
@@ -257,4 +248,85 @@ TabView::_ValidDragAndDrop(const BMessage* message)
 
 
 	return fTabsContainer->GetAffinity() == fromContainer->GetAffinity();
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+Filler::Filler(TabsContainer* tabsContainer)
+		: BView("filler", B_WILL_DRAW),
+			  fTabsContainer(tabsContainer)
+{
+
+}
+
+void
+Filler::Draw(BRect rect)
+{
+	BRect bounds(Bounds());
+	TabViewTools::DrawTabBackground(this, bounds, rect);
+	if (fTabDragging) {
+		rgb_color color = ui_color(B_CONTROL_HIGHLIGHT_COLOR);
+		color.alpha = 170;
+		SetHighColor(color);
+		SetDrawingMode(B_OP_ALPHA);
+		FillRect(Bounds());
+	}
+}
+
+
+void
+Filler::MouseUp(BPoint where)
+{
+	if (fTabDragging) {
+		fTabDragging = false;
+		Invalidate();
+	}
+}
+
+
+void
+Filler::MessageReceived(BMessage* message)
+{
+	switch (message->what) {
+		case TAB_DRAG:
+			/*if(_ValidDragAndDrop(message))*/
+				fTabsContainer->OnDropTab(nullptr, message);
+		break;
+		default:
+			BView::MessageReceived(message);
+		break;
+	};
+}
+
+
+void
+Filler::MouseMoved(BPoint where, uint32 transit, const BMessage* dragMessage)
+{
+	if (dragMessage &&
+		dragMessage->what == TAB_DRAG /*&&
+		_ValidDragAndDrop(dragMessage)*/) {
+		switch (transit) {
+			case B_ENTERED_VIEW:
+			case B_INSIDE_VIEW:
+			{
+				//TabView* fromTab = (TabView*)dragMessage->GetPointer("tab_view", this);
+				fTabDragging = true;//(fromTab != this);
+				Invalidate();
+				return;
+			}
+			break;
+			default:
+			if (fTabDragging) {
+				fTabDragging = false;
+				Invalidate();
+			}
+			break;
+		};
+	} else {
+
+		if (fTabDragging) {
+			fTabDragging = false;
+			Invalidate();
+		}
+	}
 }

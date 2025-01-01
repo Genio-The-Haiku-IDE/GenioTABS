@@ -21,8 +21,6 @@ class TabsContainer;
 
 #define TAB_DRAG 		'DRAG'
 
-//TODO: this class could derive from a BView as well.
-
 class TabView : public BView , public Draggable {
 public:
 								TabView(const char* label, TabsContainer* controller);
@@ -64,4 +62,26 @@ private:
 			bool				fIsFront;
 			BString				fLabel;
 			bool				fTabDragging;
+};
+
+
+class Filler : public BView
+{
+	public:
+		Filler(TabsContainer* tabsContainer);
+
+		void Draw(BRect rect) override;
+
+		void	MouseUp(BPoint where) override;
+
+
+		void	MessageReceived(BMessage* message) override;
+
+
+		void MouseMoved(BPoint where, uint32 transit,
+									const BMessage* dragMessage) override;
+
+	private:
+		bool				fTabDragging;
+		TabsContainer*		fTabsContainer;
 };
