@@ -44,6 +44,8 @@ public:
 
 	void	SelectTab(TabView* tab, bool invoke = true);
 
+	GTabView*	GetGTabView() { return fGTabView; }
+
 	tab_affinity	GetAffinity() { return fAffinity; }
 	void			SetAffinity(tab_affinity aff) { fAffinity = aff; }
 

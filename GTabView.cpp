@@ -145,14 +145,14 @@ GTabView::MoveTabs(TabView* fromTab, TabView* toTab, TabsContainer* fromContaine
 	int32 fromIndex = fromContainer->IndexOfTab(fromTab);
 	int32 toIndex = toTab == nullptr ? fTabsContainer->CountTabs() : fTabsContainer->IndexOfTab(toTab);
 
-	BLayoutItem* fromLayout = fCardView->CardLayout()->ItemAt(fromIndex);
+	BLayoutItem* fromLayout = fromContainer->GetGTabView()->CardView()->CardLayout()->ItemAt(fromIndex);
 	BView*	fromView = fromLayout->View();
 	if (!fromView)
 		return;
 
 	fromView->RemoveSelf();
 
-	fCardView->CardLayout()->RemoveItem(fromLayout);
+	fromLayout->RemoveSelf();
 
 	BString label = fromTab->Label(); //TODO copy all the props
 	TabView* removedTab = fromContainer->RemoveTab(fromTab);

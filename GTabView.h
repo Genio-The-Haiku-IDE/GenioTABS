@@ -38,6 +38,7 @@ class GTabView : public BGroupView
 	private:
 
 		virtual TabView*	CreateTabView(const char* label);
+		BCardView*			CardView() { return fCardView;}
 
 	private:
 
