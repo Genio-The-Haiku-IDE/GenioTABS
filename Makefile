@@ -37,7 +37,8 @@ SRCS =  App.cpp \
 		NeoWindow.cpp \
 		TabView.cpp \
 		GTabView.cpp \
-		TabsContainer.cpp
+		TabsContainer.cpp \
+		NewWindow.cpp
 
 
 #	Specify the resource definition files to use. Full or relative paths can be

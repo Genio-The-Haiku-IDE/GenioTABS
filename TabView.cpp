@@ -316,7 +316,6 @@ TabViewCloseButton::MouseUp(BPoint where)
 		bool inside = closeRect.Contains(where);
 		if (inside && fTabsContainer) {
 			fTabsContainer->CloseTab(this);
-			fTabsContainer->ShiftTabs(0);
 		}
 	}
 	TabView::MouseUp(where);

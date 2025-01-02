@@ -37,6 +37,7 @@ TabsContainer::AddTab(TabView* tab, int32 index, bool select)
 		SelectTab(tab);
 	}
 
+	ShiftTabs(0);
 }
 
 int32
@@ -86,6 +87,9 @@ TabsContainer::RemoveTab(TabView* tab)
 
 	delete tab->LayoutItem();
 	tab->SetLayoutItem(nullptr);
+
+	ShiftTabs(0);
+
 	return tab;
 }
 
