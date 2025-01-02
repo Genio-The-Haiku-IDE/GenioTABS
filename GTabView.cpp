@@ -36,6 +36,25 @@ GTabView::AddTab(const char* label, BView* view)
 	fCardView->AddChild(view);
 }
 
+
+void
+GTabView::CloseTab(TabView* tab)
+{
+	//Remove the View from CardView
+	int32 fromIndex = fTabsContainer->IndexOfTab(tab);
+	BLayoutItem* fromLayout = fCardView->CardLayout()->ItemAt(fromIndex);
+	BView*	fromView = fromLayout->View();
+	if (!fromView)
+		return;
+
+	fromView->RemoveSelf();
+
+	fCardView->CardLayout()->RemoveItem(fromLayout);
+
+	delete fTabsContainer->RemoveTab(tab);
+}
+
+
 void
 GTabView::UpdateScrollButtons(bool left, bool right)
 {

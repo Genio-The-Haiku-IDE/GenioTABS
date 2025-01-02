@@ -26,11 +26,13 @@ public:
 
 	TabView* TabAt(int32 index); //used?
 
+	void	CloseTab(TabView* tab); //Remove and delete a tab
+
+	TabView* RemoveTab(TabView* tab); //just remove, not delete.
+
 	int32	IndexOfTab(TabView* tab);
 
-	TabView* RemoveTab(TabView* tab);
-
-	void	ShiftTabs(int32 delta);
+	void	ShiftTabs(int32 delta); // 0 to refresh the current state
 
 	void MouseDown(TabView* tab, BPoint where);
 

@@ -63,6 +63,13 @@ TabsContainer::IndexOfTab(TabView* tab)
 	return GroupLayout()->IndexOfItem(tab->LayoutItem());
 }
 
+void
+TabsContainer::CloseTab(TabView* tab)
+{
+	if (fGTabView)
+		fGTabView->CloseTab(tab);
+}
+
 
 TabView*
 TabsContainer::RemoveTab(TabView* tab)
@@ -144,6 +151,8 @@ TabsContainer::MouseDown(TabView* tab, BPoint where)
 	SelectTab(tab);
 	OnMouseDown(where);
 }
+
+
 
 void
 TabsContainer::FrameResized(float w, float h)

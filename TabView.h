@@ -54,7 +54,7 @@ public:
 
 			BString				Label() { return fLabel; };
 
-private:
+protected:
 			bool				_ValidDragAndDrop(const BMessage* msg);
 
 			TabsContainer*		fTabsContainer;
