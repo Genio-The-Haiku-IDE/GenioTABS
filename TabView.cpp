@@ -417,7 +417,7 @@ TabViewCloseButton::DrawCloseButton(BView* owner, BRect buttonRect, const BRect&
 ///////////////////////////////////////////////////////////////////////////////
 
 Filler::Filler(TabsContainer* tabsContainer)
-		: BView("filler", B_WILL_DRAW),
+		: BView("_filler_", B_WILL_DRAW),
 			  fTabsContainer(tabsContainer)
 {
 

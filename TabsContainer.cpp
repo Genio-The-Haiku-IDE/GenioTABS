@@ -38,6 +38,8 @@ TabsContainer::AddTab(TabView* tab, int32 index, bool select)
 	}
 
 	ShiftTabs(0);
+
+	_PrintToStream();
 }
 
 int32
@@ -189,13 +191,29 @@ TabsContainer::OnDropTab(TabView* toTab, BMessage* message)
 
 
 void
+TabsContainer::_PrintToStream()
+{
+	for (int32 i=0;i<GroupLayout()->CountItems();i++) {
+		printf("%d) %s\n", i, GroupLayout()->ItemAt(i)->View()->Name());
+	}
+}
+
+
+
+void
 TabsContainer::_UpdateScrolls()
 {
 	if (CountTabs() > 0) {
 		GroupLayout()->Relayout(true);
-		TabView* last = TabAt(CountTabs()-1);
+		TabView* last = TabAt(CountTabs() - 1);
+		if (last == nullptr) {
+			debugger("qui");
+			printf("Count tabs: %d\n", CountTabs() - 1);
+			last = TabAt(CountTabs() - 1);
+			_PrintToStream();
+		}
 
-		if(fGTabView != nullptr)
+		if(fGTabView != nullptr && last != nullptr)
 			fGTabView->UpdateScrollButtons(fTabShift != 0, last->Frame().right > Bounds().right);
 	}
 }

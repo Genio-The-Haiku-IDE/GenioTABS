@@ -52,6 +52,14 @@ public:
 		SetExplicitPreferredSize(BSize(50, B_SIZE_UNSET));
 	}
 
+	virtual	status_t	Invoke(BMessage* message = NULL)
+	{
+		if (IsVisible())
+			return BButton::Invoke(message);
+
+		return B_OK;
+	}
+
 	virtual BSize MinSize()
 	{
 		return BSize(20, TabViewTools::DefaultTabHeigh());
@@ -69,9 +77,10 @@ public:
 
 	virtual void Draw(BRect updateRect)
 	{
+		BRect bounds(Bounds());
+		TabViewTools::DrawTabBackground(this, bounds, updateRect);
+
 		if (fHidden == false) {
-			BRect bounds(Bounds());
-			TabViewTools::DrawTabBackground(this, bounds, updateRect);
 			rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
 			if (IsEnabled()) {
 				uint32 flags = be_control_look->Flags(this);
@@ -92,6 +101,18 @@ public:
 	{
 	}
 
+	void	SetVisible(bool visible)
+	{
+		fHidden = !visible;
+		Invalidate();
+	};
+
+	bool	IsVisible()
+	{
+		return !fHidden;
+	}
+
+private:
 	bool	fHidden;
 };
 

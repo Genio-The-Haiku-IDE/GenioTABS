@@ -21,7 +21,7 @@ class TabView;
 class GTabView : public BGroupView
 {
 	public:
-		GTabView(bool closeButton);
+				GTabView(bool closeButton);
 
 		void	AddTab(const char* label, BView* view);
 

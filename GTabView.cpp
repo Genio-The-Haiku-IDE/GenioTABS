@@ -62,7 +62,9 @@ GTabView::DestroyTabAndView(TabView* tab)
 void
 GTabView::UpdateScrollButtons(bool left, bool right)
 {
-	_SetButtonVisibility(fScrollLeftTabButton,  left);
+	//_SetButtonVisibility(fScrollLeftTabButton,  left);
+	fScrollLeftTabButton->SetVisible(left);
+	//fScrollRightTabButton->SetVisible(right);
 	_SetButtonVisibility(fScrollRightTabButton, right);
 }
 
@@ -136,8 +138,7 @@ GTabView::_Init()
 		.AddGlue(1)
 		;
 
-	fScrollLeftTabButton->Hide();
-	fScrollRightTabButton->Hide();
+	UpdateScrollButtons(false, false);
 }
 
 void
@@ -155,7 +156,15 @@ GTabView::MoveTabs(TabView* fromTab, TabView* toTab, TabsContainer* fromContaine
 {
 	//Remove the View from CardView
 	int32 fromIndex = fromContainer->IndexOfTab(fromTab);
-	int32 toIndex = toTab == nullptr ? fTabsContainer->CountTabs() : fTabsContainer->IndexOfTab(toTab);
+	int32 toIndex = -1 ;
+
+	if (toTab == nullptr) {
+		toIndex =  fTabsContainer->CountTabs(); // last position
+		if (fTabsContainer == fromContainer )
+			toIndex--; //exclude filler?
+	} else {
+		toIndex = fTabsContainer->IndexOfTab(toTab);
+	}
 
 	BLayoutItem* fromLayout = fromContainer->GetGTabView()->CardView()->CardLayout()->ItemAt(fromIndex);
 	BView*	fromView = fromLayout->View();

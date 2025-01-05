@@ -48,7 +48,7 @@ public:
 	void			SetAffinity(tab_affinity aff) { fAffinity = aff; }
 
 private:
-
+	void	_PrintToStream();
 	void	_UpdateScrolls();
 
 	TabView*	fSelectedTab;
