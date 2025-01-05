@@ -4,27 +4,27 @@
  */
 
 
-#include "TabView.h"
+#include "GTab.h"
 #include <ControlLook.h>
 #include "TabsContainer.h"
 #include <Bitmap.h>
 
 #define ALPHA 			200
 
-TabView::TabView(const char* label, TabsContainer* controller)
+GTab::GTab(const char* label, TabsContainer* controller)
 	: BView("_tabView_", B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE),
 	fTabsContainer(controller), fIsFront(false), fLabel(label), fTabDragging(false)
 {
 }
 
 
-TabView::~TabView()
+GTab::~GTab()
 {
 }
 
 
 BSize
-TabView::MinSize()
+GTab::MinSize()
 {
 	BSize size(MaxSize());
 	size.width = 100.0f;
@@ -32,7 +32,7 @@ TabView::MinSize()
 }
 
 BSize
-TabView::MaxSize()
+GTab::MaxSize()
 {
 	float labelWidth = 150.0f;
 	return BSize(labelWidth, TabViewTools::DefaultTabHeigh());
@@ -40,7 +40,7 @@ TabView::MaxSize()
 
 
 void
-TabView::Draw(BRect updateRect)
+GTab::Draw(BRect updateRect)
 {
 	DrawTab(this, updateRect);
 	if (fTabDragging) {
@@ -53,7 +53,7 @@ TabView::Draw(BRect updateRect)
 }
 
 void
-TabView::DrawTab(BView* owner, BRect updateRect)
+GTab::DrawTab(BView* owner, BRect updateRect)
 {
 	BRect frame(owner->Bounds());
     if (fIsFront) {
@@ -74,7 +74,7 @@ TabView::DrawTab(BView* owner, BRect updateRect)
 }
 
 void
-TabView::DrawBackground(BView* owner, BRect frame, const BRect& updateRect, bool isFront)
+GTab::DrawBackground(BView* owner, BRect frame, const BRect& updateRect, bool isFront)
 {
 	rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
 	uint32 borders = BControlLook::B_TOP_BORDER | BControlLook::B_BOTTOM_BORDER;
@@ -90,7 +90,7 @@ TabView::DrawBackground(BView* owner, BRect frame, const BRect& updateRect, bool
 
 
 void
-TabView::DrawContents(BView* owner, BRect frame, const BRect& updateRect, bool isFront)
+GTab::DrawContents(BView* owner, BRect frame, const BRect& updateRect, bool isFront)
 {
 	rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
 	be_control_look->DrawLabel(owner, fLabel.String(), frame, updateRect,
@@ -99,7 +99,7 @@ TabView::DrawContents(BView* owner, BRect frame, const BRect& updateRect, bool i
 
 
 void
-TabView::MouseDown(BPoint where)
+GTab::MouseDown(BPoint where)
 {
  	if (fTabsContainer)
 		fTabsContainer->MouseDown(this, where);
@@ -109,7 +109,7 @@ TabView::MouseDown(BPoint where)
 
 
 void
-TabView::MouseUp(BPoint where)
+GTab::MouseUp(BPoint where)
 {
 	OnMouseUp(where);
 	if (fTabDragging) {
@@ -120,7 +120,7 @@ TabView::MouseUp(BPoint where)
 
 
 void
-TabView::MouseMoved(BPoint where, uint32 transit, const BMessage* dragMessage)
+GTab::MouseMoved(BPoint where, uint32 transit, const BMessage* dragMessage)
 {
 	if (dragMessage &&
 	    dragMessage->what == TAB_DRAG &&
@@ -129,7 +129,7 @@ TabView::MouseMoved(BPoint where, uint32 transit, const BMessage* dragMessage)
 			case B_ENTERED_VIEW:
 			case B_INSIDE_VIEW:
 			{
-				TabView* fromTab = (TabView*)dragMessage->GetPointer("tab_view", this);
+				GTab* fromTab = (GTab*)dragMessage->GetPointer("tab_view", this);
 				fTabDragging = (fromTab != this);
 				Invalidate();
 				return;
@@ -154,7 +154,7 @@ TabView::MouseMoved(BPoint where, uint32 transit, const BMessage* dragMessage)
 
 
 void
-TabView::MessageReceived(BMessage* message)
+GTab::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
 		case TAB_DRAG:
@@ -170,9 +170,9 @@ TabView::MessageReceived(BMessage* message)
 
 
 bool
-TabView::InitiateDrag(BPoint where)
+GTab::InitiateDrag(BPoint where)
 {
-	TabView* tab = this;
+	GTab* tab = this;
 	if (tab != nullptr) {
 		BMessage message(TAB_DRAG);
 
@@ -217,7 +217,7 @@ TabView::InitiateDrag(BPoint where)
 
 
 void
-TabView::SetIsFront(bool isFront)
+GTab::SetIsFront(bool isFront)
 {
 	if (fIsFront == isFront)
 		return;
@@ -227,16 +227,16 @@ TabView::SetIsFront(bool isFront)
 }
 
 bool
-TabView::IsFront() const
+GTab::IsFront() const
 {
 	return fIsFront;
 }
 
 
 bool
-TabView::_ValidDragAndDrop(const BMessage* message)
+GTab::_ValidDragAndDrop(const BMessage* message)
 {
-	TabView*		fromTab = (TabView*)message->GetPointer("tab_view", nullptr);
+	GTab*		fromTab = (GTab*)message->GetPointer("tab_view", nullptr);
 	TabsContainer*	fromContainer = (TabsContainer*)message->GetPointer("tab_container", nullptr);
 
 	if (fromTab == nullptr || fromContainer == nullptr)
@@ -266,7 +266,7 @@ IncreaseContrastBy(float& tint, const float& value, const int& brightness)
 TabViewCloseButton::TabViewCloseButton(const char* label,
 										TabsContainer* controller,
 										const BHandler* handler):
-										TabView(label, controller),
+										GTab(label, controller),
 										fOverCloseRect(false),
 										fClicked(false),
 										fHandler(handler)
@@ -278,13 +278,13 @@ TabViewCloseButton::TabViewCloseButton(const char* label,
 BSize
 TabViewCloseButton::MinSize()
 {
-	return TabView::MinSize();
+	return GTab::MinSize();
 }
 
 BSize
 TabViewCloseButton::MaxSize()
 {
-	BSize s(TabView::MaxSize());
+	BSize s(GTab::MaxSize());
 	//s.width += kCloseButtonWidth;
 	return s;
 }
@@ -296,7 +296,7 @@ TabViewCloseButton::DrawContents(BView* owner, BRect frame,
 {
 	BRect labelFrame = frame;
 	labelFrame.right -= kCloseButtonWidth;
-	TabView::DrawContents(owner, labelFrame, updateRect, isFront);
+	GTab::DrawContents(owner, labelFrame, updateRect, isFront);
 	frame.left = labelFrame.right;
 	DrawCloseButton(owner, frame, updateRect, isFront);
 	return;
@@ -313,7 +313,7 @@ TabViewCloseButton::MouseDown(BPoint where)
 		Invalidate(closeRect);
 		return;
 	}
-	TabView::MouseDown(where);
+	GTab::MouseDown(where);
 }
 
 void
@@ -329,7 +329,7 @@ TabViewCloseButton::MouseUp(BPoint where)
 			CloseButtonClicked();
 		}
 	}
-	TabView::MouseUp(where);
+	GTab::MouseUp(where);
 }
 
 
@@ -338,7 +338,7 @@ void
 TabViewCloseButton::MouseMoved(BPoint where, uint32 transit,
 										const BMessage* dragMessage)
 {
-	TabView::MouseMoved(where, transit, dragMessage);
+	GTab::MouseMoved(where, transit, dragMessage);
 	if (dragMessage == nullptr) {
 		BRect closeRect = RectCloseButton();
 		bool inside = closeRect.Contains(where);
@@ -465,7 +465,7 @@ Filler::MessageReceived(BMessage* message)
 bool
 Filler::_ValidDragAndDrop(const BMessage* message)
 {
-	TabView*		fromTab = (TabView*)message->GetPointer("tab_view", nullptr);
+	GTab*		fromTab = (GTab*)message->GetPointer("tab_view", nullptr);
 	TabsContainer*	fromContainer = (TabsContainer*)message->GetPointer("tab_container", nullptr);
 
 	if (fromTab == nullptr || fromContainer == nullptr)

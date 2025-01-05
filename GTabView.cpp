@@ -6,7 +6,7 @@
 
 #include "GTabView.h"
 #include "TabButtons.h"
-#include "TabView.h"
+#include "GTab.h"
 #include "TabsContainer.h"
 
 enum {
@@ -38,7 +38,7 @@ GTabView::AddTab(const char* label, BView* view)
 
 
 void
-GTabView::DestroyTabAndView(TabView* tab)
+GTabView::DestroyTabAndView(GTab* tab)
 {
 	//Remove the View from CardView
 	int32 fromIndex = fTabsContainer->IndexOfTab(tab);
@@ -51,7 +51,7 @@ GTabView::DestroyTabAndView(TabView* tab)
 
 	fCardView->CardLayout()->RemoveItem(fromLayout);
 
-	TabView* rtab = fTabsContainer->RemoveTab(tab);
+	GTab* rtab = fTabsContainer->RemoveTab(tab);
 	if (rtab)
 		delete rtab;
 
@@ -98,7 +98,7 @@ GTabView::MessageReceived(BMessage* message)
 		break;
 		case TabViewCloseButton::kTVCloseButton:
 		{
-			TabView* tab = (TabView*)message->GetPointer("tab", nullptr);
+			GTab* tab = (GTab*)message->GetPointer("tab", nullptr);
 			if (tab != nullptr) {
 				DestroyTabAndView(tab);
 			}
@@ -152,7 +152,7 @@ GTabView::_SetButtonVisibility(TabButton* button, bool newState)
 
 
 void
-GTabView::MoveTabs(TabView* fromTab, TabView* toTab, TabsContainer* fromContainer)
+GTabView::MoveTabs(GTab* fromTab, GTab* toTab, TabsContainer* fromContainer)
 {
 	//Remove the View from CardView
 	int32 fromIndex = fromContainer->IndexOfTab(fromTab);
@@ -176,21 +176,21 @@ GTabView::MoveTabs(TabView* fromTab, TabView* toTab, TabsContainer* fromContaine
 	fromLayout->RemoveSelf();
 
 	BString label = fromTab->Label(); //TODO copy all the props
-	TabView* removedTab = fromContainer->RemoveTab(fromTab);
+	GTab* removedTab = fromContainer->RemoveTab(fromTab);
 	delete removedTab;
 
-	TabView* newTab = CreateTabView(label.String());
+	GTab* newTab = CreateTabView(label.String());
 	fTabsContainer->AddTab(newTab, toIndex);
 	fCardView->CardLayout()->AddItem(toIndex, fromLayout);
 	fTabsContainer->SelectTab(newTab);
 }
 
 
-TabView*
+GTab*
 GTabView::CreateTabView(const char* label)
 {
 	return fCloseButton ? new TabViewCloseButton(label, fTabsContainer, this)
-						: new TabView(label, fTabsContainer);
+						: new GTab(label, fTabsContainer);
 }
 
 

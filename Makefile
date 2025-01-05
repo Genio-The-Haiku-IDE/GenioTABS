@@ -35,7 +35,7 @@ SRCS =  App.cpp \
 		GenioTabView \
 		GenioTab \
 		NeoWindow.cpp \
-		TabView.cpp \
+		GTab.cpp \
 		GTabView.cpp \
 		TabsContainer.cpp \
 		NewWindow.cpp

@@ -5,7 +5,7 @@
 
 
 #include "TabsContainer.h"
-#include "TabView.h"
+#include "GTab.h"
 #include "GTabView.h"
 #include <cassert>
 
@@ -25,7 +25,7 @@ TabsContainer::TabsContainer(GTabView* tabView, BMessage* message):
 
 
 void
-TabsContainer::AddTab(TabView* tab, int32 index, bool select)
+TabsContainer::AddTab(GTab* tab, int32 index, bool select)
 {
 	if (index == -1)
 		index = CountTabs();
@@ -48,18 +48,18 @@ TabsContainer::CountTabs()
 	return GroupLayout()->CountItems() - 1; //exclude the Filler.
 }
 
-TabView*
+GTab*
 TabsContainer::TabAt(int32 index)
 {
 	if (index < 0 || index >= CountTabs())
 		return nullptr;
 
-	return dynamic_cast<TabView*>(GroupLayout()->ItemAt(index)->View());
+	return dynamic_cast<GTab*>(GroupLayout()->ItemAt(index)->View());
 }
 
 
 int32
-TabsContainer::IndexOfTab(TabView* tab)
+TabsContainer::IndexOfTab(GTab* tab)
 {
 	if (fSelectedTab == nullptr)
 		return -1;
@@ -67,8 +67,8 @@ TabsContainer::IndexOfTab(TabView* tab)
 }
 
 
-TabView*
-TabsContainer::RemoveTab(TabView* tab)
+GTab*
+TabsContainer::RemoveTab(GTab* tab)
 {
 	tab->LayoutItem()->RemoveSelf();
 	tab->RemoveSelf();
@@ -89,7 +89,7 @@ TabsContainer::RemoveTab(TabView* tab)
 }
 
 
-TabView*
+GTab*
 TabsContainer::SelectedTab()
 {
 	return fSelectedTab;
@@ -97,7 +97,7 @@ TabsContainer::SelectedTab()
 
 
 void
-TabsContainer::SelectTab(TabView* tab, bool invoke)
+TabsContainer::SelectTab(GTab* tab, bool invoke)
 {
 	if (tab != fSelectedTab) {
 		if (fSelectedTab)
@@ -129,7 +129,7 @@ TabsContainer::ShiftTabs(int32 delta)
 	int32 max = std::max(newShift, fTabShift);
 
 	for (int32 i=0;i<max;i++) {
-		TabView* tab = TabAt(i);
+		GTab* tab = TabAt(i);
 		if (i < newShift) {
 			if (tab->IsHidden() == false)
 				tab->Hide();
@@ -145,7 +145,7 @@ TabsContainer::ShiftTabs(int32 delta)
 
 
 void
-TabsContainer::MouseDown(TabView* tab, BPoint where)
+TabsContainer::MouseDown(GTab* tab, BPoint where)
 {
 	SelectTab(tab);
 	OnMouseDown(where);
@@ -159,10 +159,10 @@ TabsContainer::FrameResized(float w, float h)
 	//Auto-scroll:
 	if (fTabShift > 0) {
 		int32 tox = 0;
-		TabView* last = TabAt(CountTabs()-1);
+		GTab* last = TabAt(CountTabs()-1);
 		float right =  last->Frame().right;
 		for (int32 i=fTabShift - 1;i>=0;i--){
-			TabView* tab = TabAt(i);
+			GTab* tab = TabAt(i);
 			right =  right + tab->Frame().Width();
 			if (right < w)
 				tox--;
@@ -178,9 +178,9 @@ TabsContainer::FrameResized(float w, float h)
 }
 
 void
-TabsContainer::OnDropTab(TabView* toTab, BMessage* message)
+TabsContainer::OnDropTab(GTab* toTab, BMessage* message)
 {
-	TabView*		fromTab = (TabView*)message->GetPointer("tab_view", nullptr);
+	GTab*		fromTab = (GTab*)message->GetPointer("tab_view", nullptr);
 	TabsContainer*	fromContainer = (TabsContainer*)message->GetPointer("tab_container", nullptr);
 
 	if (fromTab == nullptr || fromContainer == nullptr || toTab == fromTab)
@@ -205,7 +205,7 @@ TabsContainer::_UpdateScrolls()
 {
 	if (CountTabs() > 0) {
 		GroupLayout()->Relayout(true);
-		TabView* last = TabAt(CountTabs() - 1);
+		GTab* last = TabAt(CountTabs() - 1);
 		if (last == nullptr) {
 			debugger("qui");
 			printf("Count tabs: %d\n", CountTabs() - 1);

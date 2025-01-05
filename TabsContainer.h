@@ -10,7 +10,7 @@
 #include <SupportDefs.h>
 #include "Draggable.h"
 
-class TabView;
+class GTab;
 class GTabView;
 
 typedef uint32 tab_affinity;
@@ -20,27 +20,27 @@ public:
 
 			TabsContainer(GTabView* tabView, BMessage* message = nullptr);
 
-	void	AddTab(TabView* tab, int32 index = -1, bool select = false);
+	void	AddTab(GTab* tab, int32 index = -1, bool select = false);
 
 	int32 	CountTabs();
 
-	TabView* TabAt(int32 index); //used?
+	GTab* TabAt(int32 index); //used?
 
-	TabView* RemoveTab(TabView* tab); //just remove, not delete.
+	GTab* RemoveTab(GTab* tab); //just remove, not delete.
 
-	int32	IndexOfTab(TabView* tab);
+	int32	IndexOfTab(GTab* tab);
 
 	void	ShiftTabs(int32 delta); // 0 to refresh the current state
 
-	void MouseDown(TabView* tab, BPoint where);
+	void MouseDown(GTab* tab, BPoint where);
 
 	void FrameResized(float w, float h) override;
 
-	void OnDropTab(TabView* toTab, BMessage* message);
+	void OnDropTab(GTab* toTab, BMessage* message);
 
-	TabView*	SelectedTab();
+	GTab*	SelectedTab();
 
-	void	SelectTab(TabView* tab, bool invoke = true);
+	void	SelectTab(GTab* tab, bool invoke = true);
 
 	GTabView*	GetGTabView() { return fGTabView; }
 
@@ -51,7 +51,7 @@ private:
 	void	_PrintToStream();
 	void	_UpdateScrolls();
 
-	TabView*	fSelectedTab;
+	GTab*	fSelectedTab;
 	GTabView*	fGTabView;
 	int32		fTabShift;
 	tab_affinity	fAffinity;

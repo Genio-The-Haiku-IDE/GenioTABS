@@ -16,7 +16,7 @@ class TabsContainer;
 class ScrollRightTabButton;
 class TabMenuTabButton;
 class TabButton;
-class TabView;
+class GTab;
 
 class GTabView : public BGroupView
 {
@@ -31,13 +31,13 @@ class GTabView : public BGroupView
 
 		void	MessageReceived(BMessage* message);
 
-		void	MoveTabs(TabView* fromTab, TabView* toTab, TabsContainer* fromContainer);
+		void	MoveTabs(GTab* fromTab, GTab* toTab, TabsContainer* fromContainer);
 
 	private:
 
-		virtual TabView*	CreateTabView(const char* label);
+		virtual GTab*	CreateTabView(const char* label);
 		BCardView*			CardView() { return fCardView;}
-		void				DestroyTabAndView(TabView* tab); //Remove and delete a tab and the view.
+		void				DestroyTabAndView(GTab* tab); //Remove and delete a tab and the view.
 
 	private:
 
