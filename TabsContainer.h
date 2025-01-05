@@ -26,8 +26,6 @@ public:
 
 	TabView* TabAt(int32 index); //used?
 
-	void	CloseTab(TabView* tab); //Remove and delete a tab
-
 	TabView* RemoveTab(TabView* tab); //just remove, not delete.
 
 	int32	IndexOfTab(TabView* tab);

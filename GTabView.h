@@ -25,8 +25,6 @@ class GTabView : public BGroupView
 
 		void	AddTab(const char* label, BView* view);
 
-		void	CloseTab(TabView* tab); //Remove and delete a tab
-
 		void	UpdateScrollButtons(bool left, bool right);
 
 		void	AttachedToWindow();
@@ -39,6 +37,7 @@ class GTabView : public BGroupView
 
 		virtual TabView*	CreateTabView(const char* label);
 		BCardView*			CardView() { return fCardView;}
+		void				DestroyTabAndView(TabView* tab); //Remove and delete a tab and the view.
 
 	private:
 

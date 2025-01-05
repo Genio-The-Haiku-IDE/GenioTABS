@@ -64,13 +64,6 @@ TabsContainer::IndexOfTab(TabView* tab)
 	return GroupLayout()->IndexOfItem(tab->LayoutItem());
 }
 
-void
-TabsContainer::CloseTab(TabView* tab)
-{
-	if (fGTabView)
-		fGTabView->CloseTab(tab);
-}
-
 
 TabView*
 TabsContainer::RemoveTab(TabView* tab)

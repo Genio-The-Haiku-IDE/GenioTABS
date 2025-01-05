@@ -263,6 +263,17 @@ IncreaseContrastBy(float& tint, const float& value, const int& brightness)
 }
 
 
+TabViewCloseButton::TabViewCloseButton(const char* label,
+										TabsContainer* controller,
+										const BHandler* handler):
+										TabView(label, controller),
+										fOverCloseRect(false),
+										fClicked(false),
+										fHandler(handler)
+{
+
+}
+
 //FIX: we should better understand how to extend the default sizes.
 BSize
 TabViewCloseButton::MinSize()
@@ -315,7 +326,7 @@ TabViewCloseButton::MouseUp(BPoint where)
 		BRect closeRect = RectCloseButton();
 		bool inside = closeRect.Contains(where);
 		if (inside && fTabsContainer) {
-			fTabsContainer->CloseTab(this);
+			CloseButtonClicked();
 		}
 	}
 	TabView::MouseUp(where);
@@ -351,6 +362,16 @@ TabViewCloseButton::RectCloseButton()
 	frame.top = frame.bottom - frame.Width();
 	return frame;
 }
+
+
+void
+TabViewCloseButton::CloseButtonClicked()
+{
+	BMessage msg(kTVCloseButton);
+	msg.AddPointer("tab", this);
+	BMessenger(fHandler).SendMessage(&msg);
+}
+
 
 
 void

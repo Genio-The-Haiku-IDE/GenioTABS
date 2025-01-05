@@ -66,7 +66,12 @@ protected:
 
 class TabViewCloseButton : public TabView {
 public:
-	  using TabView::TabView;
+
+		enum { kTVCloseButton = 'TVCB' };
+
+					TabViewCloseButton(const char* label,
+										TabsContainer* controller,
+										const BHandler* handler);
 
 		virtual	BSize		MinSize() override;
 		virtual	BSize		MaxSize() override;
@@ -82,11 +87,12 @@ private:
 
 				BRect		RectCloseButton();
 
-
+				void		CloseButtonClicked();
 private:
 
-				bool fOverCloseRect = false;
-				bool fClicked = false;
+				bool fOverCloseRect;
+				bool fClicked;
+				const BHandler* fHandler;
 };
 
 

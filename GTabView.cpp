@@ -38,7 +38,7 @@ GTabView::AddTab(const char* label, BView* view)
 
 
 void
-GTabView::CloseTab(TabView* tab)
+GTabView::DestroyTabAndView(TabView* tab)
 {
 	//Remove the View from CardView
 	int32 fromIndex = fTabsContainer->IndexOfTab(tab);
@@ -51,7 +51,11 @@ GTabView::CloseTab(TabView* tab)
 
 	fCardView->CardLayout()->RemoveItem(fromLayout);
 
-	delete fTabsContainer->RemoveTab(tab);
+	TabView* rtab = fTabsContainer->RemoveTab(tab);
+	if (rtab)
+		delete rtab;
+
+	delete fromView;
 }
 
 
@@ -88,6 +92,14 @@ GTabView::MessageReceived(BMessage* message)
 			int32 index = message->GetInt32("index", 0);
 			if (index > -1)
 				fCardView->CardLayout()->SetVisibleItem(index);
+		}
+		break;
+		case TabViewCloseButton::kTVCloseButton:
+		{
+			TabView* tab = (TabView*)message->GetPointer("tab", nullptr);
+			if (tab != nullptr) {
+				DestroyTabAndView(tab);
+			}
 		}
 		break;
 		default:
@@ -168,7 +180,7 @@ GTabView::MoveTabs(TabView* fromTab, TabView* toTab, TabsContainer* fromContaine
 TabView*
 GTabView::CreateTabView(const char* label)
 {
-	return fCloseButton ? new TabViewCloseButton(label, fTabsContainer)
+	return fCloseButton ? new TabViewCloseButton(label, fTabsContainer, this)
 						: new TabView(label, fTabsContainer);
 }
 
