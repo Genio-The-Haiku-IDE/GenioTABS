@@ -391,8 +391,8 @@ GenioTabView::TabFrame(int32 index) const
 void
 GenioTabView::FrameResized(float newWidth, float newHeight)
 {
-	if (CountTabs() > 0 && newWidth <= TabFrame(CountTabs()-1).right)
-		printf("NON ci sta -> %s \n", TabAt(CountTabs()-1)->Label());
+/*	if (CountTabs() > 0 && newWidth <= TabFrame(CountTabs()-1).right)
+		printf("NON ci sta -> %s \n", TabAt(CountTabs()-1)->Label());*/
 	BTabView::FrameResized(newWidth, newHeight);
 }
 

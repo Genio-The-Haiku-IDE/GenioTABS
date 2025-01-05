@@ -208,6 +208,8 @@ TabsContainer::_UpdateScrolls()
 		GTab* last = TabAt(CountTabs() - 1);
 		if(fGTabView != nullptr && last != nullptr)
 			fGTabView->UpdateScrollButtons(fTabShift != 0, last->Frame().right > Bounds().right);
+	} else {
+			fGTabView->UpdateScrollButtons(false, false);
 	}
 }
 

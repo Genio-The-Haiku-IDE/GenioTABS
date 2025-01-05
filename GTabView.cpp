@@ -67,10 +67,9 @@ GTabView::DestroyTabAndView(GTab* tab)
 void
 GTabView::UpdateScrollButtons(bool left, bool right)
 {
-	//_SetButtonVisibility(fScrollLeftTabButton,  left);
-	fScrollLeftTabButton->SetVisible(left);
-	//fScrollRightTabButton->SetVisible(right);
-	_SetButtonVisibility(fScrollRightTabButton, right);
+	fScrollLeftTabButton->SetEnabled(left);
+	fScrollRightTabButton->SetEnabled(right);
+	fTabMenuTabButton->SetEnabled(fTabsContainer->CountTabs() > 0);
 }
 
 
@@ -142,15 +141,6 @@ GTabView::_Init(tab_affinity affinity)
 		;
 
 	UpdateScrollButtons(false, false);
-}
-
-void
-GTabView::_SetButtonVisibility(TabButton* button, bool newState)
-{
-	if (newState == false && !button->IsHidden()){
-			button->Hide();
-	} else if (newState == true  && button->IsHidden())
-			button->Show();
 }
 
 

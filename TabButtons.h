@@ -168,8 +168,9 @@ public:
 	virtual void DrawSymbol(BRect frame, const BRect& updateRect,
 		const rgb_color& base)
 	{
+		float tint = IsEnabled() ? B_DARKEN_4_TINT : B_DARKEN_1_TINT;
 		be_control_look->DrawArrowShape(this, frame, updateRect,
-			base, BControlLook::B_DOWN_ARROW, 0, B_DARKEN_4_TINT);
+			base, BControlLook::B_DOWN_ARROW, 0, tint);
 	}
 
 	virtual void MouseDown(BPoint point)

@@ -47,7 +47,6 @@ class GTabView : public BGroupView
 	private:
 
 		void	_Init(tab_affinity affinity);
-		void	_SetButtonVisibility(TabButton*, bool newState);
 		void	_FixContentOrientation(BView* view);
 
 
