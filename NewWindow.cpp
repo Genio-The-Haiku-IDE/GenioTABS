@@ -15,6 +15,19 @@
 #include <LayoutBuilder.h>
 #include <cstdio>
 
+class StringsGroup : public BGroupView
+{
+	public:
+		StringsGroup(const char* name):BGroupView(name, B_HORIZONTAL, 0.0f)
+		{
+			for(int32 i=0;i<3;i++) {
+				BString label;
+				label << i << "  " << name;
+				AddChild(new BStringView("test", label.String(), B_WILL_DRAW));
+			}
+		}
+};
+
 NewWindow::NewWindow()
 	:
 	BWindow(BRect(100, 100, 900, 900), "GTabView", B_TITLED_WINDOW,
@@ -29,8 +42,7 @@ NewWindow::NewWindow()
 		label << i;
 		BString text("Panel ");
 		text << i;
-		BStringView* stringView = new BStringView(label.String(), text.String());
-		fTabView1->AddTab(label.String(), stringView);
+		fTabView1->AddTab(label.String(), new StringsGroup("test"));
 	}
 
 	for (int32 i=0;i<3;i++) {

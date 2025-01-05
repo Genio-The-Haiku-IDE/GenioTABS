@@ -203,6 +203,7 @@ GTabView::MoveTabs(GTab* fromTab, GTab* toTab, TabsContainer* fromContainer)
 	fTabsContainer->AddTab(newTab, toIndex);
 	fCardView->CardLayout()->AddItem(toIndex, fromLayout);
 	fTabsContainer->SelectTab(newTab);
+	_FixContentOrientation(fromView);
 }
 
 
