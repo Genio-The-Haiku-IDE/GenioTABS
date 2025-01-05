@@ -70,14 +70,16 @@ TabsContainer::IndexOfTab(GTab* tab)
 GTab*
 TabsContainer::RemoveTab(GTab* tab)
 {
+	int32 selectedIndex = IndexOfTab(tab);
 	tab->LayoutItem()->RemoveSelf();
 	tab->RemoveSelf();
 
-
 	if (CountTabs() == 0) {
 		SelectTab(nullptr);
+	} else  if (selectedIndex >= CountTabs()) {
+		SelectTab(TabAt(CountTabs() - 1));
 	} else {
-		SelectTab(TabAt(0));
+		SelectTab(TabAt(selectedIndex));
 	}
 
 	delete tab->LayoutItem();
