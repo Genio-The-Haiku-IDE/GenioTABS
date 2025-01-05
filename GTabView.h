@@ -18,10 +18,15 @@ class TabMenuTabButton;
 class TabButton;
 class GTab;
 
+typedef uint32 tab_affinity;
+
 class GTabView : public BGroupView
 {
 	public:
-				GTabView(bool closeButton);
+				GTabView(const char* name,
+						 tab_affinity affinity,
+						 orientation orientation = B_HORIZONTAL,
+						 bool closeButton = false);
 
 		void	AddTab(const char* label, BView* view);
 
@@ -35,14 +40,15 @@ class GTabView : public BGroupView
 
 	private:
 
-		virtual GTab*	CreateTabView(const char* label);
-		BCardView*			CardView() { return fCardView;}
-		void				DestroyTabAndView(GTab* tab); //Remove and delete a tab and the view.
+		virtual GTab*		CreateTabView(const char* label);
+				BCardView*	CardView() { return fCardView;}
+				void		DestroyTabAndView(GTab* tab); //Remove and delete a tab and the view.
 
 	private:
 
-		void	_Init();
+		void	_Init(tab_affinity affinity);
 		void	_SetButtonVisibility(TabButton*, bool newState);
+		void	_FixContentOrientation(BView* view);
 
 
 		ScrollLeftTabButton*	fScrollLeftTabButton;
@@ -51,5 +57,6 @@ class GTabView : public BGroupView
 		TabMenuTabButton*		fTabMenuTabButton;
 		BCardView*				fCardView;
 		bool					fCloseButton;
+		orientation				fContentOrientation;
 };
 

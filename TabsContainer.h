@@ -9,16 +9,16 @@
 #include <Invoker.h>
 #include <SupportDefs.h>
 #include "Draggable.h"
+#include "GTabView.h"
 
 class GTab;
-class GTabView;
-
-typedef uint32 tab_affinity;
 
 class TabsContainer : public BGroupView, public BInvoker, public Draggable {
 public:
 
-			TabsContainer(GTabView* tabView, BMessage* message = nullptr);
+			TabsContainer(GTabView* tabView,
+						  tab_affinity	affinity = 0,
+						  BMessage* message = nullptr);
 
 	void	AddTab(GTab* tab, int32 index = -1, bool select = false);
 
@@ -45,7 +45,6 @@ public:
 	GTabView*	GetGTabView() { return fGTabView; }
 
 	tab_affinity	GetAffinity() { return fAffinity; }
-	void			SetAffinity(tab_affinity aff) { fAffinity = aff; }
 
 private:
 	void	_PrintToStream();

@@ -17,16 +17,20 @@ enum {
 
 };
 
-GTabView::GTabView(bool closeButton) :
-		BGroupView(B_VERTICAL, 0.0f),
+GTabView::GTabView(const char* name,
+				   tab_affinity affinity,
+				   orientation content_orientation,
+				   bool closeButton) :
+		BGroupView(name, B_VERTICAL, 0.0f),
 		fScrollLeftTabButton(nullptr),
 		fTabsContainer(nullptr),
 		fScrollRightTabButton(nullptr),
 		fTabMenuTabButton(nullptr),
 		fCardView(nullptr),
-		fCloseButton(closeButton)
+		fCloseButton(closeButton),
+		fContentOrientation(content_orientation)
 {
-	_Init();
+	_Init(affinity);
 }
 
 void
@@ -34,6 +38,7 @@ GTabView::AddTab(const char* label, BView* view)
 {
 	fTabsContainer->AddTab(CreateTabView(label));
 	fCardView->AddChild(view);
+	_FixContentOrientation(view);
 }
 
 
@@ -110,17 +115,15 @@ GTabView::MessageReceived(BMessage* message)
 }
 
 void
-GTabView::_Init()
+GTabView::_Init(tab_affinity affinity)
 {
 	fScrollLeftTabButton  = new ScrollLeftTabButton(new BMessage(kLeftTabButton));
 	fScrollRightTabButton = new ScrollRightTabButton(new BMessage(kRightTabButton));
 
-	fTabsContainer = new TabsContainer(this, new BMessage(kSelectedTabButton));
+	fTabsContainer = new TabsContainer(this, affinity, new BMessage(kSelectedTabButton));
 	fTabMenuTabButton = new TabMenuTabButton(nullptr);
 
 	fCardView = new BCardView("_cardview_");
-
-	fTabsContainer->SetAffinity('AFFY');
 
 	BLayoutBuilder::Group<>(this, B_VERTICAL, 0.0f)
 		.AddGroup(B_HORIZONTAL, 0.0f)
@@ -148,6 +151,23 @@ GTabView::_SetButtonVisibility(TabButton* button, bool newState)
 			button->Hide();
 	} else if (newState == true  && button->IsHidden())
 			button->Show();
+}
+
+
+void
+GTabView::_FixContentOrientation(BView* view)
+{
+	BLayout* layout = view->GetLayout();
+	if (!layout)
+		return;
+	BGroupLayout* grpLayout = dynamic_cast<BGroupLayout*>(layout);
+	if (!grpLayout) {
+		return;
+	}
+	if (grpLayout->Orientation() != fContentOrientation)
+	{
+		grpLayout->SetOrientation(fContentOrientation);
+	}
 }
 
 

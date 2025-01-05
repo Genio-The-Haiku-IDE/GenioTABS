@@ -18,10 +18,10 @@
 
 NeoWindow::NeoWindow()
 	:
-	BWindow(BRect(700, 400, 1200, 500), "My tabs", B_TITLED_WINDOW,
+	BWindow(BRect(700, 400, 1200, 500), "GTabView", B_TITLED_WINDOW,
 		B_ASYNCHRONOUS_CONTROLS | B_QUIT_ON_WINDOW_CLOSE)
 {
-	GTabView* tab1 = new GTabView(true);
+	GTabView* tab1 = new GTabView("tab1", 'AFF1', B_HORIZONTAL, true);
 	BLayoutBuilder::Group<>(this, B_VERTICAL, 0.0f)
 		.Add(tab1);
 

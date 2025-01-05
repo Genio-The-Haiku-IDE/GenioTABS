@@ -129,7 +129,7 @@ GTab::MouseMoved(BPoint where, uint32 transit, const BMessage* dragMessage)
 			case B_ENTERED_VIEW:
 			case B_INSIDE_VIEW:
 			{
-				GTab* fromTab = (GTab*)dragMessage->GetPointer("tab_view", this);
+				GTab* fromTab = (GTab*)dragMessage->GetPointer("tab", this);
 				fTabDragging = (fromTab != this);
 				Invalidate();
 				return;
@@ -176,7 +176,7 @@ GTab::InitiateDrag(BPoint where)
 	if (tab != nullptr) {
 		BMessage message(TAB_DRAG);
 
-		message.AddPointer("tab_view", this);
+		message.AddPointer("tab", this);
 		message.AddPointer("tab_container", fTabsContainer);
 
 		const BRect& updateRect = tab->Bounds();
@@ -236,7 +236,7 @@ GTab::IsFront() const
 bool
 GTab::_ValidDragAndDrop(const BMessage* message)
 {
-	GTab*		fromTab = (GTab*)message->GetPointer("tab_view", nullptr);
+	GTab*		fromTab = (GTab*)message->GetPointer("tab", nullptr);
 	TabsContainer*	fromContainer = (TabsContainer*)message->GetPointer("tab_container", nullptr);
 
 	if (fromTab == nullptr || fromContainer == nullptr)
@@ -244,7 +244,6 @@ GTab::_ValidDragAndDrop(const BMessage* message)
 
 	if (fTabsContainer->GetAffinity() == 0 || fromContainer->GetAffinity() == 0)
 		return false;
-
 
 	return fTabsContainer->GetAffinity() == fromContainer->GetAffinity();
 }
@@ -465,7 +464,7 @@ Filler::MessageReceived(BMessage* message)
 bool
 Filler::_ValidDragAndDrop(const BMessage* message)
 {
-	GTab*		fromTab = (GTab*)message->GetPointer("tab_view", nullptr);
+	GTab*		fromTab = (GTab*)message->GetPointer("tab", nullptr);
 	TabsContainer*	fromContainer = (TabsContainer*)message->GetPointer("tab_container", nullptr);
 
 	if (fromTab == nullptr || fromContainer == nullptr)

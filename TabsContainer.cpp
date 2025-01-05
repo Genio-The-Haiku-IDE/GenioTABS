@@ -9,13 +9,15 @@
 #include "GTabView.h"
 #include <cassert>
 
-TabsContainer::TabsContainer(GTabView* tabView, BMessage* message):
+TabsContainer::TabsContainer(GTabView* tabView,
+							 tab_affinity affinity,
+							 BMessage* message):
 	BGroupView(B_HORIZONTAL, 0.0f),
 	BInvoker(message, nullptr, nullptr),
 	fSelectedTab(nullptr),
 	fGTabView(tabView),
 	fTabShift(0),
-	fAffinity(0)
+	fAffinity(affinity)
 {
 	SetFlags(Flags()|B_FRAME_EVENTS);
 	GroupLayout()->AddView(0, new Filler(this));
@@ -38,8 +40,6 @@ TabsContainer::AddTab(GTab* tab, int32 index, bool select)
 	}
 
 	ShiftTabs(0);
-
-	_PrintToStream();
 }
 
 int32
@@ -180,7 +180,7 @@ TabsContainer::FrameResized(float w, float h)
 void
 TabsContainer::OnDropTab(GTab* toTab, BMessage* message)
 {
-	GTab*		fromTab = (GTab*)message->GetPointer("tab_view", nullptr);
+	GTab*		fromTab = (GTab*)message->GetPointer("tab", nullptr);
 	TabsContainer*	fromContainer = (TabsContainer*)message->GetPointer("tab_container", nullptr);
 
 	if (fromTab == nullptr || fromContainer == nullptr || toTab == fromTab)
@@ -206,13 +206,6 @@ TabsContainer::_UpdateScrolls()
 	if (CountTabs() > 0) {
 		GroupLayout()->Relayout(true);
 		GTab* last = TabAt(CountTabs() - 1);
-		if (last == nullptr) {
-			debugger("qui");
-			printf("Count tabs: %d\n", CountTabs() - 1);
-			last = TabAt(CountTabs() - 1);
-			_PrintToStream();
-		}
-
 		if(fGTabView != nullptr && last != nullptr)
 			fGTabView->UpdateScrollButtons(fTabShift != 0, last->Frame().right > Bounds().right);
 	}
