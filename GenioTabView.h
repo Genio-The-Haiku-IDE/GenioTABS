@@ -12,7 +12,7 @@
 
 #include "Draggable.h"
 
-class GTab;
+class GenioTab;
 
 typedef uint32	tab_drag_affinity;
 typedef uint32  tab_id;
@@ -62,7 +62,7 @@ private:
 			BView*	ContainerView() const = delete;
 			BView*	ViewForTab(int32 tabIndex) const = delete;
 
-				void	_AddTab(GTab* tab);
+				void	_AddTab(GenioTab* tab);
 
 		//virtual	void	AddTab(BView* target, BTab* tab);
 		virtual	BRect	DrawTabs();
@@ -77,7 +77,7 @@ private:
 		void	_DrawTabIndicator();
 		bool	_ValidDragAndDrop(const BMessage* msg, bool* sameTabView = nullptr);
 
-		void	_ChangeGroupViewDirection(GTab* tab);
+		void	_ChangeGroupViewDirection(GenioTab* tab);
 
 		void	_PrintMap();
 

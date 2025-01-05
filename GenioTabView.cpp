@@ -12,13 +12,13 @@
 #include <GroupView.h>
 #include <cassert>
 
-#include "GTab.h"
+#include "GenioTab.h"
 
 
 
-class IndexGTab : public GTab  {
+class IndexGTab : public GenioTab  {
 public:
-	IndexGTab(const GTab* fromTab, uint32 index):GTab(fromTab), fIndex(index){}
+	IndexGTab(const GenioTab* fromTab, uint32 index):GenioTab(fromTab), fIndex(index){}
 	uint32	fIndex;
 };
 
@@ -123,7 +123,7 @@ GenioTabView::MouseDown(BPoint where)
 {
 	if (fWithCloseButtons) {
 		for (int32 i = 0; i < CountTabs(); i++) {
-			GTab* tab = dynamic_cast<GTab*>(BTabView::TabAt(i));
+			GenioTab* tab = dynamic_cast<GenioTab*>(BTabView::TabAt(i));
 			if (tab) {
 				BRect fr = TabFrame(i);
 				BRect cl = tab->RectCloseButton(fr);
@@ -150,7 +150,7 @@ GenioTabView::MouseUp(BPoint where)
 {
 	if (fWithCloseButtons) {
 		for (int32 i = 0; i < CountTabs(); i++) {
-			GTab* tab = dynamic_cast<GTab*>(BTabView::TabAt(i));
+			GenioTab* tab = dynamic_cast<GenioTab*>(BTabView::TabAt(i));
 			if (tab) {
 				BRect fr = TabFrame(i);
 				BRect cl = tab->RectCloseButton(fr);
@@ -237,7 +237,7 @@ GenioTabView::MouseMoved(BPoint where, uint32 transit, const BMessage* dragMessa
 		// Other buttons are used to select a tab by clicking directly on it
 		if (fWithCloseButtons) {
 			for (int32 i = 0; i < CountTabs(); i++) {
-				GTab* tab = dynamic_cast<GTab*>(BTabView::TabAt(i));
+				GenioTab* tab = dynamic_cast<GenioTab*>(BTabView::TabAt(i));
 				if (tab) {
 					BRect fr = TabFrame(i);
 					BRect cl = tab->RectCloseButton(fr);
@@ -267,7 +267,7 @@ GenioTabView::MouseMoved(BPoint where, uint32 transit, const BMessage* dragMessa
 void
 GenioTabView::MoveTabs(uint32 from, uint32 to, GenioTabView* fromTabView)
 {
-	const GTab*	fromTab = dynamic_cast<GTab*>(fromTabView->TabAt(from));
+	const GenioTab*	fromTab = dynamic_cast<GenioTab*>(fromTabView->TabAt(from));
 	if (!fromTab)
 		return;
 
@@ -283,7 +283,7 @@ GenioTabView::MoveTabs(uint32 from, uint32 to, GenioTabView* fromTabView)
 
 	BString label = fromTab->Label(); //TODO copy all the props
 	fromTabView->RemoveTab(from);
-	GTab* indexTab = new IndexGTab(fromTab, to);
+	GenioTab* indexTab = new IndexGTab(fromTab, to);
 	indexTab->SetLabel(label.String());
 	_AddTab(indexTab);
 }
@@ -337,7 +337,7 @@ void
 GenioTabView::AddTab(BView* target, tab_id id)
 {
 	assert(fTabIdMap.contains(id) == false);
-	GTab* newTab = new GTab(target, id, fWithCloseButtons);
+	GenioTab* newTab = new GenioTab(target, id, fWithCloseButtons);
 	_AddTab(newTab);
 }
 
@@ -416,7 +416,7 @@ GenioTabView::ScrollBy(float y)
 
 #include <GroupLayout.h>
 void
-GenioTabView::_ChangeGroupViewDirection(GTab* tab)
+GenioTabView::_ChangeGroupViewDirection(GenioTab* tab)
 {
 	GTabContainer* fromContainer = dynamic_cast<GTabContainer*>(tab->View());
 	if (!fromContainer)
@@ -480,7 +480,7 @@ GenioTabView::RemoveTab(int32 tabIndex)
 
 
 void
-GenioTabView::_AddTab(GTab* tab)
+GenioTabView::_AddTab(GenioTab* tab)
 {
 	//experimental: let's try to improve the GroupView.
 	_ChangeGroupViewDirection(tab);

@@ -22,11 +22,11 @@ private:
 
 #define kCloseButtonWidth	20
 
-class GTab : public BTab {
+class GenioTab : public BTab {
 protected:
 friend GenioTabView;
-		GTab(BView* view, tab_id id, bool withCloseButton);
-		GTab(const GTab*);
+		GenioTab(BView* view, tab_id id, bool withCloseButton);
+		GenioTab(const GenioTab*);
 
 		tab_id	Id() { return fTabId;}
 

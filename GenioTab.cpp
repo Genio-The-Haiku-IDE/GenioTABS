@@ -4,7 +4,7 @@
  */
 
 
-#include "GTab.h"
+#include "GenioTab.h"
 
 #include <GroupLayout.h>
 
@@ -20,7 +20,7 @@ GTabContainer::GTabContainer(BView* view):BBox(view->Name()),fView(view)
 
 
 
-GTab::GTab(BView* view, tab_id id, bool withCloseButton):BTab(),
+GenioTab::GenioTab(BView* view, tab_id id, bool withCloseButton):BTab(),
 		fGTabContainer(nullptr),
 		fTabId(id),
 		fWithCloseButton(withCloseButton)
@@ -29,7 +29,7 @@ GTab::GTab(BView* view, tab_id id, bool withCloseButton):BTab(),
 	SetView(fGTabContainer);
 }
 
-GTab::GTab(const GTab* fromTab):BTab()
+GenioTab::GenioTab(const GenioTab* fromTab):BTab()
 {
 	fGTabContainer = new GTabContainer(fromTab->fGTabContainer->ContentView());
 	fTabId = fromTab->fTabId;
@@ -38,13 +38,13 @@ GTab::GTab(const GTab* fromTab):BTab()
 }
 /*
 BSize
-GTab::MaxSize()
+GenioTab::MaxSize()
 {
 	return BTab::MaxSize();
 }
 
 BSize
-GTab::PreferredSize()
+GenioTab::PreferredSize()
 {
 	return BTab::PreferredSize();
 }
@@ -53,7 +53,7 @@ GTab::PreferredSize()
 #include <ControlLook.h>
 
 void
-GTab::DrawLabel(BView* owner, BRect frame)
+GenioTab::DrawLabel(BView* owner, BRect frame)
 {
 	if (fWithCloseButton)
 		frame.right -= kCloseButtonWidth;
@@ -61,7 +61,7 @@ GTab::DrawLabel(BView* owner, BRect frame)
 }
 
 void
-GTab::DrawTab(BView* owner, BRect frame, tab_position position, bool full)
+GenioTab::DrawTab(BView* owner, BRect frame, tab_position position, bool full)
 {
 	BTab::DrawTab(owner, frame, position, full);
 	if (fWithCloseButton)
@@ -77,7 +77,7 @@ IncreaseContrastBy(float& tint, const float& value, const int& brightness)
 }
 
 BRect
-GTab::RectCloseButton(const BRect& tabRect)
+GenioTab::RectCloseButton(const BRect& tabRect)
 {
 	BRect frame  = tabRect;
 	frame.right -= 2;
@@ -88,7 +88,7 @@ GTab::RectCloseButton(const BRect& tabRect)
 	return frame;
 }
 
-void GTab::_DrawCloseButton(BView* owner, BRect& tabRect)
+void GenioTab::_DrawCloseButton(BView* owner, BRect& tabRect)
 {
 	BRect closeRect = RectCloseButton(tabRect);
 

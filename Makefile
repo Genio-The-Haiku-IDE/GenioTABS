@@ -33,7 +33,7 @@ APP_MIME_SIG = application/x-vnd.MyName-MyApp
 SRCS =  App.cpp \
 		MainWindow.cpp \
 		GenioTabView \
-		GTab \
+		GenioTab \
 		NeoWindow.cpp \
 		TabView.cpp \
 		GTabView.cpp \
