@@ -85,7 +85,14 @@ TabsContainer::RemoveTab(GTab* tab)
 	delete tab->LayoutItem();
 	tab->SetLayoutItem(nullptr);
 
-	ShiftTabs(0);
+	//fix tab visibility
+	// TODO: this could be further improved by shifting according to the free
+	// available space.
+	int shift = 0;
+	if (fTabShift > 0 && fTabShift >= CountTabs()) {
+		shift -= 1;
+	}
+	ShiftTabs(shift);
 
 	return tab;
 }
@@ -147,10 +154,17 @@ TabsContainer::ShiftTabs(int32 delta)
 
 
 void
-TabsContainer::MouseDown(GTab* tab, BPoint where)
+TabsContainer::MouseDown(GTab* tab, BPoint where, const int32 buttons)
 {
-	SelectTab(tab);
-	OnMouseDown(where);
+	if(buttons & B_PRIMARY_MOUSE_BUTTON) {
+		SelectTab(tab);
+	} else if (buttons && B_TERTIARY_MOUSE_BUTTON) {
+		if (Target()) {
+			BMessage msg(kTVCloseTab);
+			msg.AddPointer("tab", tab);
+			Invoke(&msg);
+		}
+	}
 }
 
 

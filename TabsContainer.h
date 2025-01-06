@@ -13,8 +13,10 @@
 
 class GTab;
 
-class TabsContainer : public BGroupView, public BInvoker, public Draggable {
+class TabsContainer : public BGroupView, public BInvoker {
 public:
+
+			enum { kTVCloseTab = 'TVCt' };
 
 			TabsContainer(GTabView* tabView,
 						  tab_affinity	affinity = 0,
@@ -32,7 +34,7 @@ public:
 
 	void	ShiftTabs(int32 delta); // 0 to refresh the current state
 
-	void MouseDown(GTab* tab, BPoint where);
+	void MouseDown(GTab* tab, BPoint where, const int32 buttons);
 
 	void FrameResized(float w, float h) override;
 

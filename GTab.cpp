@@ -9,7 +9,8 @@
 #include "TabsContainer.h"
 #include <Bitmap.h>
 
-#define ALPHA 			200
+#define TAB_DRAG	'DRAG'
+#define ALPHA		200
 
 GTab::GTab(const char* label, TabsContainer* controller)
 	: BView("_tabView_", B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE),
@@ -101,10 +102,19 @@ GTab::DrawContents(BView* owner, BRect frame, const BRect& updateRect, bool isFr
 void
 GTab::MouseDown(BPoint where)
 {
- 	if (fTabsContainer)
-		fTabsContainer->MouseDown(this, where);
+	BMessage* msg = Window()->CurrentMessage();
+	if (!msg)
+		return;
+	const int32 buttons = msg->GetInt32("buttons", 0);
 
-	OnMouseDown(where);
+ 	if (fTabsContainer)
+		fTabsContainer->MouseDown(this, where, buttons);
+
+	if(buttons & B_PRIMARY_MOUSE_BUTTON) {
+		OnMouseDown(where);
+	} else if (buttons & B_TERTIARY_MOUSE_BUTTON) {
+
+	}
 }
 
 
@@ -262,7 +272,7 @@ IncreaseContrastBy(float& tint, const float& value, const int& brightness)
 }
 
 
-TabViewCloseButton::TabViewCloseButton(const char* label,
+GTabCloseButton::GTabCloseButton(const char* label,
 										TabsContainer* controller,
 										const BHandler* handler):
 										GTab(label, controller),
@@ -275,13 +285,13 @@ TabViewCloseButton::TabViewCloseButton(const char* label,
 
 //FIX: we should better understand how to extend the default sizes.
 BSize
-TabViewCloseButton::MinSize()
+GTabCloseButton::MinSize()
 {
 	return GTab::MinSize();
 }
 
 BSize
-TabViewCloseButton::MaxSize()
+GTabCloseButton::MaxSize()
 {
 	BSize s(GTab::MaxSize());
 	//s.width += kCloseButtonWidth;
@@ -290,7 +300,7 @@ TabViewCloseButton::MaxSize()
 
 
 void
-TabViewCloseButton::DrawContents(BView* owner, BRect frame,
+GTabCloseButton::DrawContents(BView* owner, BRect frame,
 										const BRect& updateRect, bool isFront)
 {
 	BRect labelFrame = frame;
@@ -303,25 +313,30 @@ TabViewCloseButton::DrawContents(BView* owner, BRect frame,
 
 
 void
-TabViewCloseButton::MouseDown(BPoint where)
+GTabCloseButton::MouseDown(BPoint where)
 {
-	BRect closeRect = RectCloseButton();
-	bool inside = closeRect.Contains(where);
-	if (inside != fClicked) {
-		fClicked = inside;
-		Invalidate(closeRect);
+	BMessage* msg = Window()->CurrentMessage();
+	if (!msg)
 		return;
+	const int32 buttons = msg->GetInt32("buttons", 0);
+	if(buttons & B_PRIMARY_MOUSE_BUTTON) {
+		BRect closeRect = RectCloseButton();
+		bool inside = closeRect.Contains(where);
+		if (inside != fClicked) {
+			fClicked = inside;
+			Invalidate(closeRect);
+			return;
+		}
 	}
 	GTab::MouseDown(where);
 }
 
 void
-TabViewCloseButton::MouseUp(BPoint where)
+GTabCloseButton::MouseUp(BPoint where)
 {
 	if (fClicked) {
 		fClicked = false;
 		Invalidate();
-
 		BRect closeRect = RectCloseButton();
 		bool inside = closeRect.Contains(where);
 		if (inside && fTabsContainer) {
@@ -334,7 +349,7 @@ TabViewCloseButton::MouseUp(BPoint where)
 
 
 void
-TabViewCloseButton::MouseMoved(BPoint where, uint32 transit,
+GTabCloseButton::MouseMoved(BPoint where, uint32 transit,
 										const BMessage* dragMessage)
 {
 	GTab::MouseMoved(where, transit, dragMessage);
@@ -352,7 +367,7 @@ TabViewCloseButton::MouseMoved(BPoint where, uint32 transit,
 
 
 BRect
-TabViewCloseButton::RectCloseButton()
+GTabCloseButton::RectCloseButton()
 {
 	BRect frame  = Bounds();
 	frame.right -= be_control_look->DefaultLabelSpacing();
@@ -364,9 +379,9 @@ TabViewCloseButton::RectCloseButton()
 
 
 void
-TabViewCloseButton::CloseButtonClicked()
+GTabCloseButton::CloseButtonClicked()
 {
-	BMessage msg(kTVCloseButton);
+	BMessage msg(TabsContainer::kTVCloseTab);
 	msg.AddPointer("tab", this);
 	BMessenger(fHandler).SendMessage(&msg);
 }
@@ -374,7 +389,7 @@ TabViewCloseButton::CloseButtonClicked()
 
 
 void
-TabViewCloseButton::DrawCloseButton(BView* owner, BRect buttonRect, const BRect& updateRect,
+GTabCloseButton::DrawCloseButton(BView* owner, BRect buttonRect, const BRect& updateRect,
 							bool isFront)
 {
 	BRect closeRect = RectCloseButton();

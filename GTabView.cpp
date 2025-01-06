@@ -61,6 +61,8 @@ GTabView::DestroyTabAndView(GTab* tab)
 		delete rtab;
 
 	delete fromView;
+
+
 }
 
 
@@ -100,7 +102,7 @@ GTabView::MessageReceived(BMessage* message)
 				fCardView->CardLayout()->SetVisibleItem(index);
 		}
 		break;
-		case TabViewCloseButton::kTVCloseButton:
+		case TabsContainer::kTVCloseTab:
 		{
 			GTab* tab = (GTab*)message->GetPointer("tab", nullptr);
 			if (tab != nullptr) {
@@ -136,7 +138,6 @@ GTabView::_Init(tab_affinity affinity)
 			.SetExplicitAlignment(BAlignment(B_ALIGN_USE_FULL_WIDTH, B_ALIGN_VERTICAL_UNSET))
 			.End()
 		.Add(fCardView)
-		//.Add(new BStringView("test", "text", B_WILL_DRAW))
 		.AddGlue(1)
 		;
 
@@ -200,7 +201,7 @@ GTabView::MoveTabs(GTab* fromTab, GTab* toTab, TabsContainer* fromContainer)
 GTab*
 GTabView::CreateTabView(const char* label)
 {
-	return fCloseButton ? new TabViewCloseButton(label, fTabsContainer, this)
+	return fCloseButton ? new GTabCloseButton(label, fTabsContainer, this)
 						: new GTab(label, fTabsContainer);
 }
 

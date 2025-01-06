@@ -19,8 +19,6 @@
 
 class TabsContainer;
 
-#define TAB_DRAG 		'DRAG'
-
 class GTab : public BView , public Draggable {
 public:
 								GTab(const char* label, TabsContainer* controller);
@@ -64,14 +62,12 @@ protected:
 			bool				fTabDragging;
 };
 
-class TabViewCloseButton : public GTab {
+class GTabCloseButton : public GTab {
 public:
 
-		enum { kTVCloseButton = 'TVCB' };
-
-					TabViewCloseButton(const char* label,
-										TabsContainer* controller,
-										const BHandler* handler);
+							GTabCloseButton(const char* label,
+												TabsContainer* controller,
+												const BHandler* handler);
 
 		virtual	BSize		MinSize() override;
 		virtual	BSize		MaxSize() override;
@@ -95,13 +91,12 @@ private:
 				const BHandler* fHandler;
 };
 
-//TODO: can it be derived from GTab (?)
 class Filler : public BView
 {
 	public:
 		Filler(TabsContainer* tabsContainer);
 
-		void Draw(BRect rect) override;
+		void 	Draw(BRect rect) override;
 
 		void	MouseUp(BPoint where) override;
 
