@@ -33,9 +33,9 @@ NewWindow::NewWindow()
 	BWindow(BRect(100, 100, 900, 900), "GTabView", B_TITLED_WINDOW,
 		B_ASYNCHRONOUS_CONTROLS | B_QUIT_ON_WINDOW_CLOSE)
 {
-	fTabView1 = new GTabView("tab1", 'GTAB', B_VERTICAL,   true);
-	fTabView2 = new GTabView("tab2", 'GTA2', B_VERTICAL,   true);
-	fTabView3 = new GTabView("tab3", 'GTAB', B_HORIZONTAL, true);
+	fTabView1 = new GTabView("tab1", 'GTAB', B_VERTICAL,   true, true);
+	fTabView2 = new GTabView("tab2", 'GTA2', B_VERTICAL,   true, false);
+	fTabView3 = new GTabView("tab3", 'GTAB', B_HORIZONTAL, true, true);
 
 	for (int32 i=0;i<3;i++) {
 		BString label("Tab ");

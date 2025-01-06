@@ -127,24 +127,23 @@ GTabView::_Init(tab_affinity affinity)
 
 	fCardView = new BCardView("_cardview_");
 
-	auto builder = BLayoutBuilder::Group<>(this, B_VERTICAL, 0.0f);
-
-	builder.AddGroup(B_HORIZONTAL, 0.0f)
-			.SetExplicitAlignment(BAlignment(B_ALIGN_USE_FULL_WIDTH, B_ALIGN_VERTICAL_UNSET))
+	BLayoutBuilder::Group<>(this, B_VERTICAL, 0.0f)
+		.AddGroup(B_HORIZONTAL, 0.0f)
 			.Add(fScrollLeftTabButton)
 			.Add(fTabsContainer)
-				.AddGroup(B_HORIZONTAL, 0.0f)
-					.SetExplicitAlignment(BAlignment(B_ALIGN_RIGHT, B_ALIGN_VERTICAL_CENTER))
-					.Add(fScrollRightTabButton);
+			.AddGroup(B_HORIZONTAL, 0.0f)
+				.Add(fScrollRightTabButton)
+				.Add(fTabMenuTabButton)
+				.SetExplicitAlignment(BAlignment(B_ALIGN_RIGHT, B_ALIGN_VERTICAL_CENTER))
+				.End()
+			.SetExplicitAlignment(BAlignment(B_ALIGN_USE_FULL_WIDTH, B_ALIGN_VERTICAL_UNSET))
+			.End()
+		.Add(fCardView)
+		.AddGlue(1)
+		;
 
-	if (fMenuButton == true)
-		builder.Add(fTabMenuTabButton).End();
-
-	builder.End();	// last AddGroup
-	builder.End();	// first AddGroup
-
-	builder.Add(fCardView)
-		   .AddGlue(0);
+	if (fMenuButton == false)
+		fTabMenuTabButton->Hide();
 
 	UpdateScrollButtons(false, false);
 }
