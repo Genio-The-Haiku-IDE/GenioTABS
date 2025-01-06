@@ -39,6 +39,8 @@ class GTabView : public BGroupView
 
 		void	MoveTabs(GTab* fromTab, GTab* toTab, TabsContainer* fromContainer);
 
+		virtual void OnMenuTabButton();
+
 	private:
 
 		virtual GTab*		CreateTabView(const char* label);

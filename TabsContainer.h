@@ -22,11 +22,11 @@ public:
 						  tab_affinity	affinity = 0,
 						  BMessage* message = nullptr);
 
-	void	AddTab(GTab* tab, int32 index = -1, bool select = false);
+	void	AddTab(GTab* tab, int32 index = -1);
 
 	int32 	CountTabs();
 
-	GTab* TabAt(int32 index); //used?
+	GTab* TabAt(int32 index);
 
 	GTab* RemoveTab(GTab* tab); //just remove, not delete.
 

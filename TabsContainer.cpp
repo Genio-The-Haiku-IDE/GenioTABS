@@ -27,7 +27,7 @@ TabsContainer::TabsContainer(GTabView* tabView,
 
 
 void
-TabsContainer::AddTab(GTab* tab, int32 index, bool select)
+TabsContainer::AddTab(GTab* tab, int32 index)
 {
 	if (index == -1)
 		index = CountTabs();
@@ -35,7 +35,7 @@ TabsContainer::AddTab(GTab* tab, int32 index, bool select)
 	BLayoutItem* item = GroupLayout()->AddView(index, tab);
 	tab->SetLayoutItem (item);
 
-	if (select || CountTabs() == 1) {
+	if (CountTabs() == 1) {
 		SelectTab(tab);
 	}
 
@@ -117,12 +117,19 @@ TabsContainer::SelectTab(GTab* tab, bool invoke)
 		if (fSelectedTab)
 			fSelectedTab->SetIsFront(true);
 
+		int32 index = IndexOfTab(fSelectedTab);
 		if (invoke && Message() && Target()) {
 			BMessage msg = *Message();
 			msg.AddPointer("tab", fSelectedTab);
 			msg.AddInt32("index", IndexOfTab(fSelectedTab));
 			Invoke(&msg);
 		}
+
+		if (fTabShift >= index) {
+			ShiftTabs(index - fTabShift);
+		}
+
+		debugger("Fix case fTabShift < index");
 	}
 }
 

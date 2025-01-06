@@ -8,11 +8,13 @@
 #include "TabButtons.h"
 #include "GTab.h"
 #include "TabsContainer.h"
+#include <PopUpMenu.h>
 
 enum {
 
 	kLeftTabButton	= 'GTlb',
 	kRightTabButton = 'GTrb',
+	kMenuTabButton  = 'GTmb',
 	kSelectedTabButton = 'GTse'
 
 };
@@ -111,10 +113,57 @@ GTabView::MessageReceived(BMessage* message)
 			}
 		}
 		break;
+		case kMenuTabButton:
+		{
+			OnMenuTabButton();
+			break;
+		}
 		default:
 			BGroupView::MessageReceived(message);
 	};
 }
+
+
+void
+GTabView::OnMenuTabButton()
+{
+	BPopUpMenu* tabMenu = new BPopUpMenu("tab menu", true, false);
+	int tabCount = fTabsContainer->CountTabs();
+	for (int i = 0; i < tabCount; i++) {
+		GTab* tab = fTabsContainer->TabAt(i);
+
+		if (tab) {
+			BMenuItem* item = new BMenuItem(tab->Label(), nullptr);
+			tabMenu->AddItem(item);
+			if (tab->IsFront())
+				item->SetMarked(true);
+		}
+	}
+
+	// Force layout to get the final menu size. InvalidateLayout()
+	// did not seem to work here.
+	tabMenu->AttachedToWindow();
+	BRect buttonFrame = fTabMenuTabButton->Frame();
+	BRect menuFrame = tabMenu->Frame();
+	BPoint openPoint = ConvertToScreen(buttonFrame.LeftBottom());
+	// Open with the right side of the menu aligned with the right
+	// side of the button and a little below.
+	openPoint.x -= menuFrame.Width() - buttonFrame.Width();
+	openPoint.y += 2;
+
+	BMenuItem *selected = tabMenu->Go(openPoint, false, false,
+		ConvertToScreen(buttonFrame));
+	if (selected) {
+		selected->SetMarked(true);
+		int32 index = tabMenu->IndexOf(selected);
+		if (index != B_ERROR)
+			fTabsContainer->SelectTab(fTabsContainer->TabAt(index));
+	}
+	fTabMenuTabButton->MenuClosed();
+	delete tabMenu;
+
+}
+
 
 void
 GTabView::_Init(tab_affinity affinity)
@@ -123,7 +172,7 @@ GTabView::_Init(tab_affinity affinity)
 	fScrollRightTabButton = new ScrollRightTabButton(new BMessage(kRightTabButton));
 
 	fTabsContainer = new TabsContainer(this, affinity, new BMessage(kSelectedTabButton));
-	fTabMenuTabButton = new TabMenuTabButton(nullptr);
+	fTabMenuTabButton = new TabMenuTabButton(new BMessage(kMenuTabButton));
 
 	fCardView = new BCardView("_cardview_");
 
@@ -139,8 +188,7 @@ GTabView::_Init(tab_affinity affinity)
 			.SetExplicitAlignment(BAlignment(B_ALIGN_USE_FULL_WIDTH, B_ALIGN_VERTICAL_UNSET))
 			.End()
 		.Add(fCardView)
-		.AddGlue(1)
-		;
+		.AddGlue(1);
 
 	if (fMenuButton == false)
 		fTabMenuTabButton->Hide();

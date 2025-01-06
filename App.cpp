@@ -16,7 +16,7 @@ App::App()
 	:
 	BApplication(kApplicationSignature)
 {
-	(new MainWindow())->Show();
+	//(new MainWindow())->Show();
 	(new NewWindow())->Show();
 	//(new NeoWindow())->Show();
 }
