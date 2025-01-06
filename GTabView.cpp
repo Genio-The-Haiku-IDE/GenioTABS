@@ -20,7 +20,9 @@ enum {
 GTabView::GTabView(const char* name,
 				   tab_affinity affinity,
 				   orientation content_orientation,
-				   bool closeButton) :
+				   bool closeButton,
+				   bool menuButton) :
+
 		BGroupView(name, B_VERTICAL, 0.0f),
 		fScrollLeftTabButton(nullptr),
 		fTabsContainer(nullptr),
@@ -28,7 +30,8 @@ GTabView::GTabView(const char* name,
 		fTabMenuTabButton(nullptr),
 		fCardView(nullptr),
 		fCloseButton(closeButton),
-		fContentOrientation(content_orientation)
+		fContentOrientation(content_orientation),
+		fMenuButton(menuButton)
 {
 	_Init(affinity);
 }
@@ -61,8 +64,6 @@ GTabView::DestroyTabAndView(GTab* tab)
 		delete rtab;
 
 	delete fromView;
-
-
 }
 
 
@@ -126,20 +127,24 @@ GTabView::_Init(tab_affinity affinity)
 
 	fCardView = new BCardView("_cardview_");
 
-	BLayoutBuilder::Group<>(this, B_VERTICAL, 0.0f)
-		.AddGroup(B_HORIZONTAL, 0.0f)
+	auto builder = BLayoutBuilder::Group<>(this, B_VERTICAL, 0.0f);
+
+	builder.AddGroup(B_HORIZONTAL, 0.0f)
+			.SetExplicitAlignment(BAlignment(B_ALIGN_USE_FULL_WIDTH, B_ALIGN_VERTICAL_UNSET))
 			.Add(fScrollLeftTabButton)
 			.Add(fTabsContainer)
-			.AddGroup(B_HORIZONTAL, 0.0f)
-				.Add(fScrollRightTabButton)
-				.Add(fTabMenuTabButton)
-				.SetExplicitAlignment(BAlignment(B_ALIGN_RIGHT, B_ALIGN_VERTICAL_CENTER))
-				.End()
-			.SetExplicitAlignment(BAlignment(B_ALIGN_USE_FULL_WIDTH, B_ALIGN_VERTICAL_UNSET))
-			.End()
-		.Add(fCardView)
-		.AddGlue(1)
-		;
+				.AddGroup(B_HORIZONTAL, 0.0f)
+					.SetExplicitAlignment(BAlignment(B_ALIGN_RIGHT, B_ALIGN_VERTICAL_CENTER))
+					.Add(fScrollRightTabButton);
+
+	if (fMenuButton == true)
+		builder.Add(fTabMenuTabButton).End();
+
+	builder.End();	// last AddGroup
+	builder.End();	// first AddGroup
+
+	builder.Add(fCardView)
+		   .AddGlue(0);
 
 	UpdateScrollButtons(false, false);
 }

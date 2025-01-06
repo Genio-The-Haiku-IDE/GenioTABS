@@ -26,7 +26,8 @@ class GTabView : public BGroupView
 				GTabView(const char* name,
 						 tab_affinity affinity,
 						 orientation orientation = B_HORIZONTAL,
-						 bool closeButton = false);
+						 bool closeButton = false,
+						 bool menuButton = false);
 
 		void	AddTab(const char* label, BView* view);
 
@@ -57,5 +58,6 @@ class GTabView : public BGroupView
 		BCardView*				fCardView;
 		bool					fCloseButton;
 		orientation				fContentOrientation;
+		bool					fMenuButton;
 };
 
