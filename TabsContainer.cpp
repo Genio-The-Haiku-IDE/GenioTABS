@@ -127,9 +127,23 @@ TabsContainer::SelectTab(GTab* tab, bool invoke)
 
 		if (fTabShift >= index) {
 			ShiftTabs(index - fTabShift);
+		} else {
+			// let's ensure at least the tab's "middle point"
+			// is visible.
+			float middle = fSelectedTab->Frame().right - (fSelectedTab->Frame().Width()/2.0f);
+			if (middle > Bounds().right) {
+				int32 shift = 0;
+				for (int32 i = fTabShift; i< CountTabs();i++) {
+					GTab* nextTab = TabAt(i);
+					middle -= nextTab->Bounds().Width();
+					shift++;
+					if (middle < Bounds().right) {
+						break;
+					}
+				}
+				ShiftTabs(shift);
+			}
 		}
-
-		debugger("Fix case fTabShift < index");
 	}
 }
 
