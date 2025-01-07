@@ -218,7 +218,7 @@ void
 TabsContainer::OnDropTab(GTab* toTab, BMessage* message)
 {
 	GTab*		fromTab = (GTab*)message->GetPointer("tab", nullptr);
-	TabsContainer*	fromContainer = (TabsContainer*)message->GetPointer("tab_container", nullptr);
+	TabsContainer*	fromContainer = fromTab->Container();
 
 	if (fromTab == nullptr || fromContainer == nullptr || toTab == fromTab)
 		return;

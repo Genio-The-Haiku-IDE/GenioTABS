@@ -1,5 +1,8 @@
 /*
- * Copyright 2024, Andrea Anzani <andrea.anzani@gmail.com>
+ * Copyright 2025, Andrea Anzani <andrea.anzani@gmail.com>
+ * Original source code by:
+ * Copyright (C) 2010 Rene Gollent <rene@gollent.com>
+ * Copyright (C) 2010 Stephan Aßmus <superstippi@gmx.de>
  * All rights reserved. Distributed under the terms of the MIT license.
  */
 #pragma once
@@ -44,20 +47,12 @@ class TabViewTools {
 class TabButton : public BButton {
 public:
 	TabButton(const char* label = nullptr, BMessage* message = nullptr)
-		: BButton(label, message), fHidden(false)
+		: BButton(label, message)
 	{
 		SetExplicitAlignment(BAlignment(B_ALIGN_LEFT, B_ALIGN_VERTICAL_CENTER));
 		SetExplicitMaxSize(BSize(50, B_SIZE_UNSET));
 		SetExplicitMinSize(BSize(50, B_SIZE_UNSET));
 		SetExplicitPreferredSize(BSize(50, B_SIZE_UNSET));
-	}
-
-	virtual	status_t	Invoke(BMessage* message = NULL)
-	{
-		if (IsVisible())
-			return BButton::Invoke(message);
-
-		return B_OK;
 	}
 
 	virtual BSize MinSize()
@@ -80,20 +75,18 @@ public:
 		BRect bounds(Bounds());
 		TabViewTools::DrawTabBackground(this, bounds, updateRect);
 
-		if (fHidden == false) {
-			rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
-			if (IsEnabled()) {
-				uint32 flags = be_control_look->Flags(this);
-				rgb_color button = tint_color(base, 1.07);
-				be_control_look->DrawButtonBackground(this, bounds, updateRect,
-					button, flags, 0);
-			}
-			bounds.left = (bounds.left + bounds.right) / 2 - 6;
-			bounds.top = (bounds.top + bounds.bottom) / 2 - 6;
-			bounds.right = bounds.left + 12;
-			bounds.bottom = bounds.top + 12;
-			DrawSymbol(bounds, updateRect, base);
+		rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
+		if (IsEnabled()) {
+			uint32 flags = be_control_look->Flags(this);
+			rgb_color button = tint_color(base, 1.07);
+			be_control_look->DrawButtonBackground(this, bounds, updateRect,
+				button, flags, 0);
 		}
+		bounds.left = (bounds.left + bounds.right) / 2 - 6;
+		bounds.top = (bounds.top + bounds.bottom) / 2 - 6;
+		bounds.right = bounds.left + 12;
+		bounds.bottom = bounds.top + 12;
+		DrawSymbol(bounds, updateRect, base);
 	}
 
 	virtual void DrawSymbol(BRect frame, const BRect& updateRect,
@@ -101,19 +94,6 @@ public:
 	{
 	}
 
-	void	SetVisible(bool visible)
-	{
-		fHidden = !visible;
-		Invalidate();
-	};
-
-	bool	IsVisible()
-	{
-		return !fHidden;
-	}
-
-private:
-	bool	fHidden;
 };
 
 
@@ -159,11 +139,6 @@ public:
 		, fCloseTime(0)
 	{
 	}
-/*
-	virtual BSize MinSize()
-	{
-		return BSize(18, 12);
-	}*/
 
 	virtual void DrawSymbol(BRect frame, const BRect& updateRect,
 		const rgb_color& base)

@@ -21,7 +21,7 @@ class TabsContainer;
 
 class GTab : public BView , public Draggable {
 public:
-								GTab(const char* label, TabsContainer* controller);
+								GTab(const char* label, TabsContainer* container);
 	virtual						~GTab();
 
 	virtual	BSize				MinSize() override;
@@ -51,6 +51,8 @@ public:
 			void				SetLayoutItem(BLayoutItem* layItem) { fLayoutItem = layItem; }
 
 			BString				Label() { return fLabel; };
+
+			TabsContainer* 		Container() { return fTabsContainer; }
 
 protected:
 			bool				_ValidDragAndDrop(const BMessage* msg);

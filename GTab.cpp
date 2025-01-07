@@ -12,9 +12,9 @@
 #define TAB_DRAG	'DRAG'
 #define ALPHA		200
 
-GTab::GTab(const char* label, TabsContainer* controller)
+GTab::GTab(const char* label, TabsContainer* container)
 	: BView("_tabView_", B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE),
-	fTabsContainer(controller), fIsFront(false), fLabel(label), fTabDragging(false)
+	fTabsContainer(container), fIsFront(false), fLabel(label), fTabDragging(false)
 {
 }
 
@@ -247,7 +247,7 @@ bool
 GTab::_ValidDragAndDrop(const BMessage* message)
 {
 	GTab*		fromTab = (GTab*)message->GetPointer("tab", nullptr);
-	TabsContainer*	fromContainer = (TabsContainer*)message->GetPointer("tab_container", nullptr);
+	TabsContainer*	fromContainer = fromTab->Container();
 
 	if (fromTab == nullptr || fromContainer == nullptr)
 		return false;
@@ -480,7 +480,7 @@ bool
 Filler::_ValidDragAndDrop(const BMessage* message)
 {
 	GTab*		fromTab = (GTab*)message->GetPointer("tab", nullptr);
-	TabsContainer*	fromContainer = (TabsContainer*)message->GetPointer("tab_container", nullptr);
+	TabsContainer*	fromContainer = fromTab->Container();
 
 	if (fromTab == nullptr || fromContainer == nullptr)
 		return false;
