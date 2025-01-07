@@ -38,12 +38,21 @@ GTabView::GTabView(const char* name,
 	_Init(affinity);
 }
 
-void
+GTab*
 GTabView::AddTab(const char* label, BView* view)
 {
-	fTabsContainer->AddTab(CreateTabView(label));
+	GTab* tab = CreateTabView(label);
+	fTabsContainer->AddTab(tab);
 	fCardView->AddChild(view);
 	_FixContentOrientation(view);
+	return tab;
+}
+
+
+int32
+GTabView::CountTabs()
+{
+	return fTabsContainer->CountTabs();
 }
 
 
@@ -168,11 +177,13 @@ GTabView::OnMenuTabButton()
 void
 GTabView::_Init(tab_affinity affinity)
 {
-	fScrollLeftTabButton  = new ScrollLeftTabButton(new BMessage(kLeftTabButton));
-	fScrollRightTabButton = new ScrollRightTabButton(new BMessage(kRightTabButton));
-
 	fTabsContainer = new TabsContainer(this, affinity, new BMessage(kSelectedTabButton));
-	fTabMenuTabButton = new TabMenuTabButton(new BMessage(kMenuTabButton));
+
+	fScrollLeftTabButton  = new GTabScrollLeftButton(new BMessage(kLeftTabButton), fTabsContainer);
+	fScrollRightTabButton = new GTabScrollRightButton(new BMessage(kRightTabButton), fTabsContainer);
+
+
+	fTabMenuTabButton = new GTabMenuTabButton(new BMessage(kMenuTabButton));
 
 	fCardView = new BCardView("_cardview_");
 

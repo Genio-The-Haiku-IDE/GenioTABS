@@ -11,11 +11,11 @@
 #include <SupportDefs.h>
 #include <CardView.h>
 
-class ScrollLeftTabButton;
+class GTabScrollLeftButton;
 class TabsContainer;
-class ScrollRightTabButton;
-class TabMenuTabButton;
-class TabButton;
+class GTabScrollRightButton;
+class GTabMenuTabButton;
+class GTabButton;
 class GTab;
 
 typedef uint32 tab_affinity;
@@ -29,7 +29,9 @@ class GTabView : public BGroupView
 						 bool closeButton = false,
 						 bool menuButton = false);
 
-		void	AddTab(const char* label, BView* view);
+		GTab*	AddTab(const char* label, BView* view);
+
+		int32	CountTabs();
 
 		void	UpdateScrollButtons(bool left, bool right);
 
@@ -53,10 +55,10 @@ class GTabView : public BGroupView
 		void	_FixContentOrientation(BView* view);
 
 
-		ScrollLeftTabButton*	fScrollLeftTabButton;
+		GTabScrollLeftButton*	fScrollLeftTabButton;
 		TabsContainer*			fTabsContainer;
-		ScrollRightTabButton*	fScrollRightTabButton;
-		TabMenuTabButton*		fTabMenuTabButton;
+		GTabScrollRightButton*	fScrollRightTabButton;
+		GTabMenuTabButton*		fTabMenuTabButton;
 		BCardView*				fCardView;
 		bool					fCloseButton;
 		orientation				fContentOrientation;

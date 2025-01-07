@@ -42,11 +42,19 @@ class TabViewTools {
 			uint32 borders = BControlLook::B_TOP_BORDER | BControlLook::B_BOTTOM_BORDER;
 			be_control_look->DrawInactiveTab(view, bounds, updateRect, base, 0, borders);
 		}
+		static void DrawDroppingZone(BView* view, BRect rect)
+		{
+			rgb_color color = ui_color(B_CONTROL_HIGHLIGHT_COLOR);
+			color.alpha = 170;
+			view->SetHighColor(color);
+			view->SetDrawingMode(B_OP_ALPHA);
+			view->FillRect(rect);
+		}
 };
 
-class TabButton : public BButton {
+class GTabButton : public BButton {
 public:
-	TabButton(const char* label = nullptr, BMessage* message = nullptr)
+	GTabButton(const char* label = nullptr, BMessage* message = nullptr)
 		: BButton(label, message)
 	{
 		SetExplicitAlignment(BAlignment(B_ALIGN_LEFT, B_ALIGN_VERTICAL_CENTER));
@@ -96,46 +104,10 @@ public:
 
 };
 
-
-class ScrollLeftTabButton : public TabButton {
+class GTabMenuTabButton : public GTabButton {
 public:
-	ScrollLeftTabButton(BMessage* message)
-		: TabButton(" ", message)
-	{
-	}
-
-	virtual void DrawSymbol(BRect frame, const BRect& updateRect,
-		const rgb_color& base)
-	{
-		float tint = IsEnabled() ? B_DARKEN_4_TINT : B_DARKEN_1_TINT;
-		be_control_look->DrawArrowShape(this, frame, updateRect,
-			base, BControlLook::B_LEFT_ARROW, 0, tint);
-	}
-};
-
-
-class ScrollRightTabButton : public TabButton {
-public:
-	ScrollRightTabButton(BMessage* message)
-		: TabButton(" ", message)
-	{
-	}
-
-	virtual void DrawSymbol(BRect frame, const BRect& updateRect,
-		const rgb_color& base)
-	{
-		frame.OffsetBy(1, 0);
-		float tint = IsEnabled() ? B_DARKEN_4_TINT : B_DARKEN_1_TINT;
-		be_control_look->DrawArrowShape(this, frame, updateRect,
-			base, BControlLook::B_RIGHT_ARROW, 0, tint);
-	}
-};
-
-
-class TabMenuTabButton : public TabButton {
-public:
-	TabMenuTabButton(BMessage* message)
-		: TabButton(" ", message)
+	GTabMenuTabButton(BMessage* message)
+		: GTabButton(" ", message)
 		, fCloseTime(0)
 	{
 	}

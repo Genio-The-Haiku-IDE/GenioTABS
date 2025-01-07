@@ -12,9 +12,73 @@
 #define TAB_DRAG	'DRAG'
 #define ALPHA		200
 
+
+
+bool
+GTabDropZone::_ValidDragAndDrop(const BMessage* message)
+{
+	GTab*		fromTab = (GTab*)message->GetPointer("tab", nullptr);
+	TabsContainer*	fromContainer = fromTab->Container();
+
+	if (fromTab == nullptr || fromContainer == nullptr)
+		return false;
+
+	if (this == fromTab)
+		return false;
+
+	if (Container()->GetAffinity() == 0 || fromContainer->GetAffinity() == 0)
+		return false;
+
+	return Container()->GetAffinity() == fromContainer->GetAffinity();
+}
+
+
+bool
+GTabDropZone::DropZoneMouseMoved(BView* view,
+								 BPoint where,
+								 uint32 transit,
+								 const BMessage* dragMessage)
+{
+	if (dragMessage &&
+	    dragMessage->what == TAB_DRAG &&
+		_ValidDragAndDrop(dragMessage)) {
+		switch (transit) {
+			case B_ENTERED_VIEW:
+			case B_INSIDE_VIEW:
+			{
+				StartDragging(view);
+				return true;
+			}
+			break;
+			default:
+				StopDragging(view);
+			break;
+		};
+	} else {
+
+		OnMouseMoved(where);
+		StopDragging(view);
+	}
+	return false;
+}
+
+
+bool
+GTabDropZone::DropZoneMessageReceived(BMessage* message)
+{
+	if (message->what == TAB_DRAG) {
+		if(_ValidDragAndDrop(message))
+			OnDropMessage(message);
+		return true;
+	}
+	return false;
+}
+
+
+
 GTab::GTab(const char* label, TabsContainer* container)
 	: BView("_tabView_", B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE),
-	fTabsContainer(container), fIsFront(false), fLabel(label), fTabDragging(false)
+	GTabDropZone(container), fIsFront(false), fLabel(label)/*, fTabDragging(false)*/
 {
 }
 
@@ -44,13 +108,7 @@ void
 GTab::Draw(BRect updateRect)
 {
 	DrawTab(this, updateRect);
-	if (fTabDragging) {
-		rgb_color color = ui_color(B_CONTROL_HIGHLIGHT_COLOR);
-		color.alpha = 170;
-		SetHighColor(color);
-		SetDrawingMode(B_OP_ALPHA);
-		FillRect(Bounds());
-	}
+	DropZoneDraw(this, Bounds());
 }
 
 void
@@ -107,11 +165,11 @@ GTab::MouseDown(BPoint where)
 		return;
 	const int32 buttons = msg->GetInt32("buttons", 0);
 
- 	if (fTabsContainer)
-		fTabsContainer->MouseDown(this, where, buttons);
+ 	if (Container())
+		Container()->MouseDown(this, where, buttons);
 
 	if(buttons & B_PRIMARY_MOUSE_BUTTON) {
-		OnMouseDown(where);
+		DropZoneMouseDown(where);
 	} else if (buttons & B_TERTIARY_MOUSE_BUTTON) {
 
 	}
@@ -121,60 +179,22 @@ GTab::MouseDown(BPoint where)
 void
 GTab::MouseUp(BPoint where)
 {
-	OnMouseUp(where);
-	if (fTabDragging) {
-		fTabDragging = false;
-		Invalidate();
-	}
+	DropZoneMouseUp(this, where);
 }
 
 
 void
 GTab::MouseMoved(BPoint where, uint32 transit, const BMessage* dragMessage)
 {
-	if (dragMessage &&
-	    dragMessage->what == TAB_DRAG &&
-		_ValidDragAndDrop(dragMessage)) {
-		switch (transit) {
-			case B_ENTERED_VIEW:
-			case B_INSIDE_VIEW:
-			{
-				GTab* fromTab = (GTab*)dragMessage->GetPointer("tab", this);
-				fTabDragging = (fromTab != this);
-				Invalidate();
-				return;
-			}
-			break;
-			default:
-			if (fTabDragging) {
-				fTabDragging = false;
-				Invalidate();
-			}
-			break;
-		};
-	} else {
-
-		OnMouseMoved(where);
-		if (fTabDragging) {
-			fTabDragging = false;
-			Invalidate();
-		}
-	}
+	DropZoneMouseMoved(this, where, transit, dragMessage);
 }
 
 
 void
 GTab::MessageReceived(BMessage* message)
 {
-	switch (message->what) {
-		case TAB_DRAG:
-			if(_ValidDragAndDrop(message))
-				fTabsContainer->OnDropTab(this, message);
-		break;
-		default:
-			BView::MessageReceived(message);
-		break;
-	};
+	if (DropZoneMessageReceived(message) == false)
+		BView::MessageReceived(message);
 }
 
 
@@ -187,7 +207,7 @@ GTab::InitiateDrag(BPoint where)
 		BMessage message(TAB_DRAG);
 
 		message.AddPointer("tab", this);
-		message.AddPointer("tab_container", fTabsContainer);
+		message.AddPointer("tab_container", Container());
 
 		const BRect& updateRect = tab->Bounds();
 
@@ -242,21 +262,12 @@ GTab::IsFront() const
 	return fIsFront;
 }
 
-
-bool
-GTab::_ValidDragAndDrop(const BMessage* message)
+void
+GTab::OnDropMessage(BMessage* message)
 {
-	GTab*		fromTab = (GTab*)message->GetPointer("tab", nullptr);
-	TabsContainer*	fromContainer = fromTab->Container();
-
-	if (fromTab == nullptr || fromContainer == nullptr)
-		return false;
-
-	if (fTabsContainer->GetAffinity() == 0 || fromContainer->GetAffinity() == 0)
-		return false;
-
-	return fTabsContainer->GetAffinity() == fromContainer->GetAffinity();
+	Container()->OnDropTab(this, message);
 }
+
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -339,7 +350,7 @@ GTabCloseButton::MouseUp(BPoint where)
 		Invalidate();
 		BRect closeRect = RectCloseButton();
 		bool inside = closeRect.Contains(where);
-		if (inside && fTabsContainer) {
+		if (inside && Container()) {
 			CloseButtonClicked();
 		}
 	}
@@ -432,7 +443,7 @@ GTabCloseButton::DrawCloseButton(BView* owner, BRect buttonRect, const BRect& up
 
 Filler::Filler(TabsContainer* tabsContainer)
 		: BView("_filler_", B_WILL_DRAW),
-			  fTabsContainer(tabsContainer)
+			  GTabDropZone(tabsContainer)
 {
 
 }
@@ -442,83 +453,35 @@ Filler::Draw(BRect rect)
 {
 	BRect bounds(Bounds());
 	TabViewTools::DrawTabBackground(this, bounds, rect);
-	if (fTabDragging) {
-		rgb_color color = ui_color(B_CONTROL_HIGHLIGHT_COLOR);
-		color.alpha = 170;
-		SetHighColor(color);
-		SetDrawingMode(B_OP_ALPHA);
-		FillRect(Bounds());
-	}
+	DropZoneDraw(this, bounds);
 }
 
 
 void
 Filler::MouseUp(BPoint where)
 {
-	if (fTabDragging) {
-		fTabDragging = false;
-		Invalidate();
-	}
+	DropZoneMouseUp(this, where);
 }
 
 
 void
 Filler::MessageReceived(BMessage* message)
 {
-	switch (message->what) {
-		case TAB_DRAG:
-			if(_ValidDragAndDrop(message))
-				fTabsContainer->OnDropTab(nullptr, message);
-		break;
-		default:
-			BView::MessageReceived(message);
-		break;
-	};
+	if (DropZoneMessageReceived(message) == false)
+		BView::MessageReceived(message);
 }
-
-bool
-Filler::_ValidDragAndDrop(const BMessage* message)
-{
-	GTab*		fromTab = (GTab*)message->GetPointer("tab", nullptr);
-	TabsContainer*	fromContainer = fromTab->Container();
-
-	if (fromTab == nullptr || fromContainer == nullptr)
-		return false;
-
-	if (fTabsContainer->GetAffinity() == 0 || fromContainer->GetAffinity() == 0)
-		return false;
-
-
-	return fTabsContainer->GetAffinity() == fromContainer->GetAffinity();
-}
-
 
 void
 Filler::MouseMoved(BPoint where, uint32 transit, const BMessage* dragMessage)
 {
-	if (dragMessage &&
-		dragMessage->what == TAB_DRAG &&
-		_ValidDragAndDrop(dragMessage)) {
-		switch (transit) {
-			case B_ENTERED_VIEW:
-			case B_INSIDE_VIEW:
-			{
-				fTabDragging = true;
-				Invalidate();
-				return;
-			}
-			break;
-			default:
-			if (fTabDragging) {
-				fTabDragging = false;
-				Invalidate();
-			}
-			break;
-		};
-	} else {
-		if (fTabDragging) {
-			fTabDragging = false;
-			Invalidate();
-		}
-	}
+	DropZoneMouseMoved(this, where, transit, dragMessage);
 }
+
+
+void
+Filler::OnDropMessage(BMessage* message)
+{
+	Container()->OnDropTab(nullptr, message);
+}
+
+

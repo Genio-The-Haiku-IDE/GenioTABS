@@ -38,7 +38,8 @@ SRCS =  App.cpp \
 		GTab.cpp \
 		GTabView.cpp \
 		TabsContainer.cpp \
-		NewWindow.cpp
+		NewWindow.cpp \
+		GenioToolsTabView.cpp
 
 
 #	Specify the resource definition files to use. Full or relative paths can be

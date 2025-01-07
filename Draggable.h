@@ -12,21 +12,21 @@ class Draggable {
 public:
 	Draggable() {};
 
-	void OnMouseDown(BPoint where )
+	virtual void OnMouseDown(BPoint where )
 	{
 		fDragging = false;
 		fTryDrag = true;
 		fDragPoint = where;
 	}
 
-	void OnMouseUp(BPoint where)
+	virtual void OnMouseUp(BPoint where)
 	{
 		fTryDrag = false;
 		fDragging = false;
 		fDragPoint = BPoint(0, 0);
 	}
 
-	void OnMouseMoved(BPoint where)
+	virtual void OnMouseMoved(BPoint where)
 	{
 		if (fTryDrag) {
 			// initiate a drag if the mouse was moved far enough
