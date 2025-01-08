@@ -90,8 +90,9 @@ MainWindow::MessageReceived(BMessage* message)
 			printf("-- TAB1 --\n");
 			printf("Min: "); printSize(fTabView1->MinSize());
 			printf("Max: "); printSize(fTabView1->MaxSize());
-			if (fTabView1->GetLayout())
+			if (fTabView1->GetLayout()) {
 				printf("Lay: "); printSize(fTabView1->GetLayout()->MaxSize());
+			}
 			printf("Pre: "); printSize(fTabView1->PreferredSize());
 			break;
 		}
