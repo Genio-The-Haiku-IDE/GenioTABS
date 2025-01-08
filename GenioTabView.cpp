@@ -306,7 +306,7 @@ BTabView::AddTab(BView* target, BTab* tab)
 	IndexGTab *gtab = dynamic_cast<IndexGTab *>(tab);
 	int32 index = CountTabs();
 	if (gtab != nullptr) {
-		if (gtab->fIndex < CountTabs())
+		if (gtab->fIndex < (uint32)CountTabs())
 			index = gtab->fIndex;
 	}
 //	printf("New Index to: %d\n", index);
