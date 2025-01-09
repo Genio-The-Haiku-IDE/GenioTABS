@@ -210,7 +210,8 @@ GTabView::_Init(tab_affinity affinity)
 				.End()
 			.SetExplicitAlignment(BAlignment(B_ALIGN_USE_FULL_WIDTH, B_ALIGN_VERTICAL_UNSET))
 			.End()
-		.Add(fCardView);
+		.Add(fCardView)
+		.AddGlue(0);
 
 	if (fMenuButton == false)
 		fTabMenuTabButton->Hide();
