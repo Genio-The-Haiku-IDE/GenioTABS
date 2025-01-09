@@ -54,8 +54,8 @@ NewWindow::NewWindow()
 		fTabView2->AddTab(label.String(), stringView);
 	}
 
-	for (int32 i=0;i<3;i++) {
-		BString label("Hor ");
+	for (int32 i=0;i<0;i++) {
+		BString label("New TAB 123");
 		label << i;
 		BString text("Hor ");
 		text << i;
@@ -68,9 +68,9 @@ NewWindow::NewWindow()
 		.AddGroup(B_HORIZONTAL, 0.0f)
 			.Add(fTabView1)
 			.AddGroup(B_VERTICAL, 0.0f)
-				.Add(new BButton("Debug","Debug", new BMessage('ack!')))
-				.Add(new BButton("__","Scroll ->", new BMessage('scro')))
-				.Add(new BButton("__","Scroll <-", new BMessage('scr2')))
+				.Add(new BButton("Debug","1", new BMessage('ack!')))
+				.Add(new BButton("__","2", new BMessage('scro')))
+				.Add(new BButton("__","3", new BMessage('scr2')))
 			.End()
 			.Add(fTabView2)
 		.End()
@@ -79,14 +79,14 @@ NewWindow::NewWindow()
 
 	fTabView1->SetExplicitMaxSize(BSize(64,64));
 	fTabView2->SetExplicitMaxSize(BSize(64,64));
-	fTabView3->SetExplicitMaxSize(BSize(64,64));
+	//fTabView3->SetExplicitMaxSize(BSize(64,64));
 }
 
 
 NewWindow::~NewWindow()
 {
 }
-
+#include "GTab.h"
 void
 NewWindow::MessageReceived(BMessage* message)
 {
@@ -103,7 +103,9 @@ NewWindow::MessageReceived(BMessage* message)
 		}
 		case 'scr2':
 		{
-//			fTabView1->ScrollBy(-50.0f);
+			BStringView* stringView = new BStringView("New TAB 123", "New TAB 123");
+			GTab* x = fTabView3->AddTab("New TAB 123", stringView);
+			printf("W %f\n", x->Frame().Width());
 			break;
 		}
 		default:
