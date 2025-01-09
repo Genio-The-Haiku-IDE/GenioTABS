@@ -9,6 +9,8 @@
 #include "GTabView.h"
 #include <cassert>
 
+#define FILLER
+
 TabsContainer::TabsContainer(GTabView* tabView,
 							 tab_affinity affinity,
 							 BMessage* message):
@@ -20,8 +22,11 @@ TabsContainer::TabsContainer(GTabView* tabView,
 	fAffinity(affinity)
 {
 	SetFlags(Flags()|B_FRAME_EVENTS);
-	GroupLayout()->AddView(0, new Filler(this));
-	SetExplicitMinSize(BSize(100, TabViewTools::DefaultTabHeigh()));
+	#ifdef FILLER
+		GroupLayout()->AddView(0, new Filler(this));
+		GroupLayout()->SetItemWeight(0, 0.2f);
+	#endif
+	SetExplicitMinSize(BSize(50, TabViewTools::DefaultTabHeigh()));
 	SetExplicitAlignment(BAlignment(B_ALIGN_LEFT, B_ALIGN_VERTICAL_CENTER));
 }
 
@@ -45,7 +50,10 @@ TabsContainer::AddTab(GTab* tab, int32 index)
 int32
 TabsContainer::CountTabs()
 {
+	#ifdef FILLER
 	return GroupLayout()->CountItems() - 1; //exclude the Filler.
+	#endif
+	return GroupLayout()->CountItems();
 }
 
 GTab*
