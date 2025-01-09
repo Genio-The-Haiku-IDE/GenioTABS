@@ -9,7 +9,7 @@
 #include "GTabView.h"
 #include <cassert>
 
-#define FILLER
+#define FILLER_WEIGHT 0.2
 
 TabsContainer::TabsContainer(GTabView* tabView,
 							 tab_affinity affinity,
@@ -22,10 +22,8 @@ TabsContainer::TabsContainer(GTabView* tabView,
 	fAffinity(affinity)
 {
 	SetFlags(Flags()|B_FRAME_EVENTS);
-	#ifdef FILLER
-		GroupLayout()->AddView(0, new Filler(this));
-		GroupLayout()->SetItemWeight(0, 0.2f);
-	#endif
+	GroupLayout()->AddView(0, new Filler(this));
+	GroupLayout()->SetItemWeight(0, FILLER_WEIGHT);
 	SetExplicitMinSize(BSize(50, TabViewTools::DefaultTabHeigh()));
 	SetExplicitAlignment(BAlignment(B_ALIGN_LEFT, B_ALIGN_VERTICAL_CENTER));
 }
@@ -50,10 +48,7 @@ TabsContainer::AddTab(GTab* tab, int32 index)
 int32
 TabsContainer::CountTabs()
 {
-	#ifdef FILLER
 	return GroupLayout()->CountItems() - 1; //exclude the Filler.
-	#endif
-	return GroupLayout()->CountItems();
 }
 
 GTab*
@@ -116,6 +111,9 @@ TabsContainer::SelectedTab()
 void
 TabsContainer::SelectTab(GTab* tab, bool invoke)
 {
+	if (tab)
+		printf("tab: %s\n", tab->Label().String());
+
 	if (tab != fSelectedTab) {
 		if (fSelectedTab)
 			fSelectedTab->SetIsFront(false);
@@ -153,6 +151,9 @@ TabsContainer::SelectTab(GTab* tab, bool invoke)
 			}
 		}
 	}
+
+	if (fSelectedTab)
+		printf("Selected: %s\n", fSelectedTab->Label().String());
 }
 
 
