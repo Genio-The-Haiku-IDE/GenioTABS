@@ -154,6 +154,11 @@ class Filler : public BView, public GTabDropZone
 	public:
 				Filler(TabsContainer* tabsContainer);
 
+		BSize	MinSize() override
+		{
+			return BSize(0,0);
+		}
+
 		void 	Draw(BRect rect) override;
 
 		void	MouseUp(BPoint where) override;
