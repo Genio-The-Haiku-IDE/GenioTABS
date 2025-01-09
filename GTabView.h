@@ -29,7 +29,7 @@ class GTabView : public BGroupView
 						 bool closeButton = false,
 						 bool menuButton = false);
 
-		GTab*	AddTab(const char* label, BView* view);
+		GTab*	AddTab(const char* label, BView* view, int32 index = -1);
 
 		int32	CountTabs();
 

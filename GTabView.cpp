@@ -39,12 +39,24 @@ GTabView::GTabView(const char* name,
 }
 
 GTab*
-GTabView::AddTab(const char* label, BView* view)
+GTabView::AddTab(const char* label, BView* view, int32 index)
 {
 	GTab* tab = CreateTabView(label);
-	fTabsContainer->AddTab(tab);
-	fCardView->AddChild(view);
+	fTabsContainer->AddTab(tab, index);
+	fCardView->CardLayout()->AddView(index, view);
 	_FixContentOrientation(view);
+#if 1
+	//debug code:
+	printf("-------- debug size for %s \n", Name());
+	BSize containerSize = fTabsContainer->Bounds().Size();
+	printf(" containerSize %f,%f\n", containerSize.Width(), containerSize.Height());
+	float accu = 0.0f;
+	for(int32 i=0;i<fTabsContainer->CountTabs();i++){
+		GTab* tab = fTabsContainer->TabAt(i);
+		accu +=  tab->Bounds().Width();
+		printf("%s w %f accu %f left %f\n", tab->Label().String(), tab->Bounds().Width(), accu, containerSize.Width() - accu);
+	}
+#endif
 	return tab;
 }
 
@@ -253,11 +265,7 @@ GTabView::MoveTabs(GTab* fromTab, GTab* toTab, TabsContainer* fromContainer)
 	GTab* removedTab = fromContainer->RemoveTab(fromTab);
 	delete removedTab;
 
-	GTab* newTab = CreateTabView(label.String());
-	fTabsContainer->AddTab(newTab, toIndex);
-	fCardView->CardLayout()->AddItem(toIndex, fromLayout);
-	fTabsContainer->SelectTab(newTab);
-	_FixContentOrientation(fromView);
+	AddTab(label.String(), fromView, toIndex);
 }
 
 
