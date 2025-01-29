@@ -5,8 +5,6 @@
 
 
 #include "App.h"
-#include "MainWindow.h"
-#include "NeoWindow.h"
 #include "NewWindow.h"
 
 const char* kApplicationSignature = "application/x-vnd.MyName-MyApp";
