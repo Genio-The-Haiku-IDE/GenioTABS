@@ -99,6 +99,9 @@ void
 NewWindow::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
+		case 'quit':
+			debugger("op");
+		break;
 		case 'ack!':
 		{
 			if (third)
