@@ -46,7 +46,7 @@ NewWindow::NewWindow()
 		text << i;
 		third = fTabView1->AddTab(label.String(), new StringsGroup("test"));
 	}
-/*
+
 	for (int32 i=0;i<3;i++) {
 		BString label("Lab ");
 		label << i;
@@ -64,7 +64,7 @@ NewWindow::NewWindow()
 		BStringView* stringView = new BStringView(label.String(), text.String());
 		fTabView3->AddTab(label.String(), stringView);
 	}
-*/
+
 
 	BLayoutBuilder::Group<>(this, B_VERTICAL, 0.0f)
 		.AddGroup(B_HORIZONTAL, 0.0f)
@@ -74,14 +74,14 @@ NewWindow::NewWindow()
 				.Add(new BButton("__","2", new BMessage('scro')))
 				.Add(new BButton("__","3", new BMessage('scr2')))
 			.End()
-			//.Add(fTabView2)
+			.Add(fTabView2)
 		.End()
-		//.Add(fTabView3)
+		.Add(fTabView3)
 	;
 
 	fTabView1->SetExplicitMaxSize(BSize(64,64));
-	//fTabView2->SetExplicitMaxSize(BSize(64,64));
-	//fTabView3->SetExplicitMaxSize(BSize(64,64));
+	fTabView2->SetExplicitMaxSize(BSize(64,64));
+	fTabView3->SetExplicitMaxSize(BSize(64,64));
 
 	if (third)
 		fTabView1->SelectTab(third);
