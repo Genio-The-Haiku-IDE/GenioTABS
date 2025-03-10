@@ -5,7 +5,7 @@
 
 
 #include "App.h"
-#include "NewWindow.h"
+#include "TGenioWindow.h"
 
 const char* kApplicationSignature = "application/x-vnd.MyName-MyApp";
 
@@ -15,7 +15,7 @@ App::App()
 	BApplication(kApplicationSignature)
 {
 	//(new MainWindow())->Show();
-	(new NewWindow())->Show();
+	(new TGenioWindow())->Show();
 	//(new NeoWindow())->Show();
 }
 

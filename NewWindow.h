@@ -7,6 +7,7 @@
 
 #include <Window.h>
 class GTabView;
+class SpecialTabView;
 
 class NewWindow : public BWindow
 {
@@ -19,7 +20,7 @@ public:
 private:
 
 			GTabView*		fTabView1;
-			GTabView*		fTabView2;
+			SpecialTabView*		fTabView2;
 			GTabView*		fTabView3;
 };
 

@@ -14,6 +14,7 @@
 #include "GTabView.h"
 #include <LayoutBuilder.h>
 #include <cstdio>
+#include "SpecialTabView.h"
 
 class StringsGroup : public BGroupView
 {
@@ -35,7 +36,7 @@ NewWindow::NewWindow()
 		B_ASYNCHRONOUS_CONTROLS | B_QUIT_ON_WINDOW_CLOSE)
 {
 	fTabView1 = new GTabView("tab1", 'GTAB', B_VERTICAL,   true, true);
-	fTabView2 = new GTabView("tab2", 'GTA2', B_VERTICAL,   false, false);
+	fTabView2 = new SpecialTabView();
 	fTabView3 = new GTabView("tab3", 'GTAB', B_HORIZONTAL, true, true);
 
 	for (int32 i=0;i<3;i++) {
@@ -48,7 +49,7 @@ NewWindow::NewWindow()
 	}
 
 	for (int32 i=0;i<3;i++) {
-		BString label("Lab ");
+		BString label("Very Log Tab OK ");
 		label << i;
 		BString text("Label ");
 		text << i;
@@ -71,8 +72,8 @@ NewWindow::NewWindow()
 			.Add(fTabView1)
 			.AddGroup(B_VERTICAL, 0.0f)
 				.Add(new BButton("Debug","1", new BMessage('ack!')))
-				.Add(new BButton("__","2", new BMessage('scro')))
-				.Add(new BButton("__","3", new BMessage('scr2')))
+				.Add(new BButton("__","label", new BMessage('scro')))
+				.Add(new BButton("__","add", new BMessage('scr2')))
 			.End()
 			.Add(fTabView2)
 		.End()
@@ -110,7 +111,7 @@ NewWindow::MessageReceived(BMessage* message)
 		}
 		case 'scro':
 		{
-//			fTabView1->ScrollBy(50.0f);
+			fTabView2->SetLabelAt(0, "zero");
 			break;
 		}
 		case 'scr2':
