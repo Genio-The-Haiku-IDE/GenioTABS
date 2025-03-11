@@ -9,6 +9,7 @@
 #include <SupportDefs.h>
 #include <Window.h>
 #include <MenuBar.h>
+#include <ToolBar.h>
 
 class TGenioWindow : public BWindow {
 public:
@@ -25,6 +26,7 @@ private:
 		 GTabView* fTabView1 = nullptr;
 		 BMenuBar* fMenuBar = nullptr;
 		 BStringView*	fRunGroup = nullptr;
+		 BPrivate::BToolBar*	fToolBar = nullptr;
 };
 
 

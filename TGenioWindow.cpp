@@ -55,10 +55,10 @@ TGenioWindow::MessageReceived(BMessage* message)
 		break;
 		case 'SHOW':
 		{
-			if (fRunGroup->IsHidden())
-				fRunGroup->Show();
+			if (fToolBar->IsHidden())
+				fToolBar->Show();
 			else
-				fRunGroup->Hide();
+				fToolBar->Hide();
 		}
 		break;
 		default:
@@ -115,11 +115,13 @@ TGenioWindow::_Init()
 
 	fTabView1 = new GTabView("tab1", 'GTAB', B_VERTICAL,   true, true);
 
-	fRunGroup = new BStringView("_", "Search bar");
-	fRunGroup->Hide();
+
+	fToolBar = new BPrivate::BToolBar();
+	fToolBar->AddAction('ADD ', nullptr, nullptr, "Add a tab", "Add");
+	fToolBar->Hide();
 
 	auto fEditorTabsGroup = BLayoutBuilder::Group<>(B_VERTICAL, 0.0f)
-		.Add(fRunGroup)
+		.Add(fToolBar)
 		.Add(fTabView1)
 	;
 
