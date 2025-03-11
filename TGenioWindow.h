@@ -24,6 +24,7 @@ private:
 
 		 GTabView* fTabView1 = nullptr;
 		 BMenuBar* fMenuBar = nullptr;
+		 BStringView*	fRunGroup = nullptr;
 };
 
 
